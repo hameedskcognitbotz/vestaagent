@@ -1,0 +1,332 @@
+{
+  "user_id": "default_user",
+  "preferences": [
+    {
+      "category": "style",
+      "preference": "Japandi Modern",
+      "impact": "positive",
+      "confidence": 0.8
+    },
+    {
+      "category": "textures",
+      "preference": "natural textures",
+      "impact": "positive",
+      "confidence": 0.8
+    },
+    {
+      "category": "style",
+      "preference": "Japandi Modern",
+      "impact": "positive",
+      "confidence": 0.8
+    },
+    {
+      "category": "textures",
+      "preference": "natural textures",
+      "impact": "positive",
+      "confidence": 0.8
+    },
+    {
+      "category": "materials",
+      "preference": "Linen Upholstery",
+      "impact": "positive",
+      "confidence": 0.8
+    },
+    {
+      "category": "materials",
+      "preference": "Reclaimed Wood",
+      "impact": "positive",
+      "confidence": 0.8
+    },
+    {
+      "category": "materials",
+      "preference": "Minimalist Oak Wood",
+      "impact": "positive",
+      "confidence": 0.8
+    }
+  ],
+  "history": [
+    {
+      "timestamp": "now",
+      "event": "Code compliance check",
+      "decision": "met",
+      "reasoning": "All critical life-safety codes met"
+    },
+    {
+      "timestamp": "now",
+      "event": "Product sourcing",
+      "decision": "completed",
+      "reasoning": "Found 2 products within budget"
+    },
+    {
+      "timestamp": "now",
+      "event": "Code compliance check",
+      "decision": "met",
+      "reasoning": "All critical life-safety codes met"
+    },
+    {
+      "timestamp": "now",
+      "event": "Product sourcing",
+      "decision": "completed",
+      "reasoning": "Found 2 products within budget"
+    },
+    {
+      "timestamp": "now",
+      "event": "Interior Layout Generation",
+      "decision": "failed",
+      "reasoning": "27 validation errors"
+    },
+    {
+      "timestamp": "now",
+      "event": "Product Sourcing",
+      "decision": "failed",
+      "reasoning": "Found 0 products"
+    },
+    {
+      "timestamp": "now",
+      "event": "Budget Check",
+      "decision": "zero budget",
+      "reasoning": "Total Budget: $0.00"
+    },
+    {
+      "timestamp": "now",
+      "event": "Interior Layout Generation",
+      "decision": "failed",
+      "reasoning": "Technical error with list indices"
+    },
+    {
+      "timestamp": "now",
+      "event": "Compliance Check",
+      "decision": "approved",
+      "reasoning": "All critical life-safety codes met"
+    },
+    {
+      "timestamp": "now",
+      "event": "Sourcing Products",
+      "decision": "no products found",
+      "reasoning": "No products available or budget not set"
+    },
+    {
+      "timestamp": "now",
+      "event": "Interior Layout Generation",
+      "decision": "failed",
+      "reasoning": "Validation errors in furniture recommendations"
+    },
+    {
+      "timestamp": "now",
+      "event": "Life-safety codes check",
+      "decision": "approved",
+      "reasoning": "All critical life-safety codes met"
+    },
+    {
+      "timestamp": "now",
+      "event": "Product sourcing",
+      "decision": "no products found",
+      "reasoning": "No products found for the space"
+    },
+    {
+      "timestamp": "now",
+      "event": "Interior Layout Generation",
+      "decision": "failed",
+      "reasoning": "Validation errors for StylistDesign recommendations"
+    },
+    {
+      "timestamp": "now",
+      "event": "Life-safety codes check",
+      "decision": "approved",
+      "reasoning": "All critical life-safety codes met"
+    },
+    {
+      "timestamp": "now",
+      "event": "Product sourcing",
+      "decision": "no products found",
+      "reasoning": "Found 0 products. Total Budget: $0.00"
+    },
+    {
+      "timestamp": "now",
+      "event": "Interior Layout Generation",
+      "decision": "failed",
+      "reasoning": "Validation errors for StylistDesign recommendations"
+    },
+    {
+      "timestamp": "now",
+      "event": "Life-safety codes check",
+      "decision": "approved",
+      "reasoning": "All critical life-safety codes met"
+    },
+    {
+      "timestamp": "now",
+      "event": "Product sourcing",
+      "decision": "no products found",
+      "reasoning": "Found 0 products. Total Budget: $0.00"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout approval",
+      "decision": "provided",
+      "reasoning": "Detailed description given"
+    },
+    {
+      "timestamp": "now",
+      "event": "Design layout provision",
+      "decision": "provided",
+      "reasoning": "Customized design layout given"
+    },
+    {
+      "timestamp": "now",
+      "event": "Compliance check",
+      "decision": "passed",
+      "reasoning": "All critical life-safety codes met"
+    },
+    {
+      "timestamp": "now",
+      "event": "Product sourcing",
+      "decision": "completed",
+      "reasoning": "6 products found, budget outlined"
+    },
+    {
+      "timestamp": "now",
+      "event": "Spatial Extraction",
+      "decision": "failed",
+      "reasoning": "Inaccurate floor plan geometry"
+    },
+    {
+      "timestamp": "now",
+      "event": "Interior Layout Generation",
+      "decision": "failed",
+      "reasoning": "Unable to determine optimal furniture arrangement"
+    },
+    {
+      "timestamp": "now",
+      "event": "Life-safety codes compliance",
+      "decision": "met",
+      "reasoning": "All critical codes met"
+    },
+    {
+      "timestamp": "now",
+      "event": "Product sourcing",
+      "decision": "no products found",
+      "reasoning": "Total Budget: $0.00"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout approval",
+      "decision": "approved",
+      "reasoning": "Met life-safety codes and within budget"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout analysis",
+      "decision": "completed",
+      "reasoning": "Two floor plans analyzed"
+    },
+    {
+      "timestamp": "now",
+      "event": "Interior Layout Generation",
+      "decision": "failed",
+      "reasoning": "No valid design JSON found"
+    },
+    {
+      "timestamp": "now",
+      "event": "Life-safety codes check",
+      "decision": "passed",
+      "reasoning": "All critical life-safety codes met"
+    },
+    {
+      "timestamp": "now",
+      "event": "Product sourcing",
+      "decision": "completed",
+      "reasoning": "Found 0 products, Total Budget: $0.00"
+    },
+    {
+      "timestamp": "now",
+      "event": "Floor plan review",
+      "decision": "identified",
+      "reasoning": "All walls and openings identified with high accuracy"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout generation",
+      "decision": "AI generated",
+      "reasoning": ""
+    },
+    {
+      "timestamp": "now",
+      "event": "Code compliance",
+      "decision": "met",
+      "reasoning": "All critical life-safety codes met"
+    },
+    {
+      "timestamp": "now",
+      "event": "Product sourcing",
+      "decision": "sourced",
+      "reasoning": "3 products found, Total Budget: $1500.00"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout review",
+      "decision": "approved",
+      "reasoning": "Met life-safety codes and included necessary rooms"
+    },
+    {
+      "timestamp": "now",
+      "event": "Product sourcing",
+      "decision": "completed",
+      "reasoning": "Found 5 products within budget of $3499.00"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout approval",
+      "decision": "approved",
+      "reasoning": "Flow Score: 100.0/100"
+    },
+    {
+      "timestamp": "now",
+      "event": "Budget consideration",
+      "decision": "accepted",
+      "reasoning": "Total Budget: $2499.00"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout review",
+      "decision": "positive",
+      "reasoning": "well-defined floor plan"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout generation",
+      "decision": "approved",
+      "reasoning": "AI generated layout"
+    },
+    {
+      "timestamp": "now",
+      "event": "Flow evaluation",
+      "decision": "optimal",
+      "reasoning": "Flow Score: 100.0/100"
+    },
+    {
+      "timestamp": "now",
+      "event": "Compliance check",
+      "decision": "passed",
+      "reasoning": "All critical life-safety codes met"
+    },
+    {
+      "timestamp": "now",
+      "event": "Budget review",
+      "decision": "zero budget",
+      "reasoning": "Total Budget: $0.00"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout approval",
+      "decision": "approved",
+      "reasoning": "Flow Score: 100.0/100"
+    },
+    {
+      "timestamp": "now",
+      "event": "Material sourcing",
+      "decision": "sourced",
+      "reasoning": "Found 3 products. Total Budget: $1500.00"
+    }
+  ],
+  "style_dna": {}
+}

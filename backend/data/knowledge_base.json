@@ -1,0 +1,44 @@
+{
+    "building_codes": {
+        "ADA": {
+            "door_width_min": 0.82,
+            "turning_radius_min": 1.5,
+            "corridor_width_min": 1.1
+        },
+        "residential": {
+            "ceiling_height_min": 2.4,
+            "habitable_room_min_area": 6.5
+        }
+    },
+    "material_science": {
+        "marble": {
+            "pros": [
+                "Aesthetic",
+                "Heat resistant"
+            ],
+            "cons": [
+                "Porous",
+                "Stains easily",
+                "High maintenance"
+            ],
+            "best_use": [
+                "Bathroom vanity",
+                "Bakery station"
+            ]
+        },
+        "quartz": {
+            "pros": [
+                "Non-porous",
+                "Durable",
+                "Low maintenance"
+            ],
+            "cons": [
+                "Heat sensitivity"
+            ],
+            "best_use": [
+                "High-traffic kitchen",
+                "Rental units"
+            ]
+        }
+    }
+}

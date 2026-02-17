@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+langgraph
+langchain
+langchain-openai
+langchain-google-genai
+langchain-groq
+pydantic
+pydantic-settings
+python-multipart
+python-dotenv
+httpx
+numpy
+scipy
+trimesh  # For backend geometry processing

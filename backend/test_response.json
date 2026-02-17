@@ -1,0 +1,231 @@
+{
+    "project_id": "69fe255e-e5f5-4076-a7e0-2424940b96db",
+    "bim_state": {
+        "project_id": "69fe255e-e5f5-4076-a7e0-2424940b96db",
+        "name": "New Project",
+        "version": 1,
+        "elements": [
+            {
+                "id": "wall-b332b5",
+                "type": "wall",
+                "position": {
+                    "x": 6.096,
+                    "y": 1.0,
+                    "z": 0.0
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "dimensions": {
+                    "x": 12.192,
+                    "y": 2.8,
+                    "z": 0.1524
+                },
+                "metadata": {
+                    "load_bearing": true
+                }
+            },
+            {
+                "id": "wall-1b31e2",
+                "type": "wall",
+                "position": {
+                    "x": 12.192,
+                    "y": 1.0,
+                    "z": 5.334
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 1.5707963267948966,
+                    "z": 0.0
+                },
+                "dimensions": {
+                    "x": 10.668,
+                    "y": 2.8,
+                    "z": 0.1524
+                },
+                "metadata": {
+                    "load_bearing": true
+                }
+            },
+            {
+                "id": "wall-7e1d76",
+                "type": "wall",
+                "position": {
+                    "x": 6.096,
+                    "y": 1.0,
+                    "z": 10.668
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 3.141592653589793,
+                    "z": 0.0
+                },
+                "dimensions": {
+                    "x": 12.192,
+                    "y": 2.8,
+                    "z": 0.1524
+                },
+                "metadata": {
+                    "load_bearing": true
+                }
+            },
+            {
+                "id": "wall-9332e1",
+                "type": "wall",
+                "position": {
+                    "x": 0.0,
+                    "y": 1.0,
+                    "z": 5.334
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": -1.5707963267948966,
+                    "z": 0.0
+                },
+                "dimensions": {
+                    "x": 10.668,
+                    "y": 2.8,
+                    "z": 0.1524
+                },
+                "metadata": {
+                    "load_bearing": true
+                }
+            },
+            {
+                "id": "wall-35c7d2",
+                "type": "wall",
+                "position": {
+                    "x": 20.5,
+                    "y": 1.0,
+                    "z": 17.5
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "dimensions": {
+                    "x": 41.0,
+                    "y": 2.8,
+                    "z": 0.15
+                },
+                "metadata": {
+                    "load_bearing": true
+                }
+            },
+            {
+                "id": "wall-c9c54c",
+                "type": "wall",
+                "position": {
+                    "x": 41.0,
+                    "y": 1.0,
+                    "z": 8.75
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 1.5707963267948966,
+                    "z": 0.0
+                },
+                "dimensions": {
+                    "x": 17.5,
+                    "y": 2.8,
+                    "z": 0.15
+                },
+                "metadata": {
+                    "load_bearing": true
+                }
+            },
+            {
+                "id": "furniture-a4a291",
+                "type": "furniture",
+                "position": {
+                    "x": 2.5,
+                    "y": 0.45,
+                    "z": 2.5
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "dimensions": {
+                    "x": 2.2,
+                    "y": 0.9,
+                    "z": 0.9
+                },
+                "metadata": {
+                    "item_type": "sofa",
+                    "reasoning": "Placed centrally in the living zone to create a conversational anchor.",
+                    "cost": 1200.0,
+                    "sourced_product": {
+                        "element_id": "furniture-a4a291",
+                        "product_name": "Emery Reversible Sectional",
+                        "vendor": "West Elm",
+                        "price": 1499.0,
+                        "currency": "USD",
+                        "stock_status": "In Stock",
+                        "product_url": "https://westelm.com/emery",
+                        "image_url": null,
+                        "match_score": 0.9
+                    },
+                    "final_price": 1499.0
+                }
+            },
+            {
+                "id": "furniture-65d838",
+                "type": "furniture",
+                "position": {
+                    "x": 2.5,
+                    "y": 0.2,
+                    "z": 3.8
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "dimensions": {
+                    "x": 1.0,
+                    "y": 0.4,
+                    "z": 0.6
+                },
+                "metadata": {
+                    "item_type": "coffee_table",
+                    "reasoning": "Scaled to complement the sofa with 1.2m clearance for walking paths.",
+                    "cost": 450.0,
+                    "sourced_product": {
+                        "element_id": "furniture-65d838",
+                        "product_name": "Noguchi Table",
+                        "vendor": "Herman Miller",
+                        "price": 895.0,
+                        "currency": "USD",
+                        "stock_status": "In Stock",
+                        "product_url": "https://hermanmiller.com/noguchi",
+                        "image_url": null,
+                        "match_score": 0.9
+                    },
+                    "final_price": 895.0
+                }
+            }
+        ],
+        "rooms": [],
+        "style_profile": {
+            "wall_color": "#F5F5F0",
+            "floor_material": "Light Oak Parquet",
+            "accent_material": null,
+            "lighting_mood": "Warm dimmable LED"
+        },
+        "compliance_logs": [
+            {
+                "timestamp": "now",
+                "is_compliant": true,
+                "summary": "All critical life-safety codes met.",
+                "violation_count": 0
+            }
+        ],
+        "budget_total": 2394.0
+    },
+    "vision_notes": "..."
+}
