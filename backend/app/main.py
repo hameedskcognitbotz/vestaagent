@@ -2,10 +2,12 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, Response
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-from backend.core.bim_state import BIMProjectState, BIMElement, ObjectType, Vector3
+from backend.core.bim_state import BIMProjectState, BIMElement, ObjectType, Vector3, BIMElementDelta
 from backend.agents.orchestrator.graph import app_graph, memory_manager, STATIC_KNOWLEDGE
+from backend.core.ifc_compiler import IFCCompiler
 from backend.core.llm_factory import (
     get_status as llm_status, 
     set_provider, 
@@ -147,6 +149,70 @@ async def chat_with_agents(request: ChatRequest):
         "bim_state": final_state["project"].model_dump(),
         "agent_response": agent_response
     }
+
+class DiffAcceptRequest(BaseModel):
+    project_id: str
+    current_state: BIMProjectState
+    delta: BIMElementDelta
+    
+@app.post("/project/diff/accept")
+async def accept_diff(request: DiffAcceptRequest):
+    """
+    Applies a specific delta (partially committed change) to the BIM state.
+    This simulates the 'Cursor' functionality of accepting a suggestion.
+    """
+    project = request.current_state
+    delta = request.delta
+    
+    # 1. Apply Additions
+    if delta.added_elements:
+        project.elements.extend(delta.added_elements)
+    
+    # 2. Apply Removals
+    if delta.removed_element_ids:
+        project.elements = [e for e in project.elements if e.id not in delta.removed_element_ids]
+        
+    # 3. Apply Modifications
+    if delta.modified_elements:
+        for mod in delta.modified_elements:
+            target_id = mod.get("id")
+            for el in project.elements:
+                if el.id == target_id:
+                    # Update field dynamically (e.g., position, rotation)
+                    # This is a simplified patch logic
+                    field = mod.get("field")
+                    new_val = mod.get("new_value")
+                    if hasattr(el, field):
+                        setattr(el, field, new_val)
+    
+    # 4. Log to history
+    project.history.append(delta)
+    
+    return {
+        "status": "committed",
+        "bim_state": project.model_dump()
+    }
+
+@app.post("/project/export/ifc")
+async def export_ifc(project: BIMProjectState):
+    """
+    Compile the current BIM State into an IFC file for Revit/ArchiCAD import.
+    """
+    try:
+        compiler = IFCCompiler(project)
+        # Use a consistent filename based on project ID
+        filename = f"vesta_export_{project.project_id}.ifc"
+        output_path = f"/tmp/{filename}"
+        
+        compiler.compile(output_path)
+        
+        return FileResponse(
+            path=output_path, 
+            filename=filename, 
+            media_type="application/x-step"
+        )
+    except Exception as e:
+        return Response(content=f"IFC Export Failed: {str(e)}", status_code=500)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=25678)

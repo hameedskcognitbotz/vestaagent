@@ -14,14 +14,23 @@ export interface BIMElement {
     position: Vector3;
     rotation: Vector3;
     dimensions: Vector3;
+    model_url?: string;
+    material_properties?: any;
     metadata: any;
+}
+
+export interface Room {
+    id: string;
+    name: string;
+    polygon: [number, number][]; // List of [x, z] tuples
+    elements: string[];
 }
 
 export interface BIMProjectState {
     project_id: string;
     name: string;
     elements: BIMElement[];
-    rooms: any[];
+    rooms: Room[];
     style_profile: any;
     budget_total: number;
     compliance_logs: any[];

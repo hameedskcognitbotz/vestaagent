@@ -8,7 +8,7 @@ import {
     Maximize, RotateCcw, Layers, Zap, MessageSquare,
     CheckCircle2, AlertTriangle, Command, GitCompare,
     Sparkles, X, Check, ArrowRight, FileCode2,
-    Wrench, SearchCode, Image, Gauge, Download
+    Wrench, SearchCode, Image, Gauge, Download, FileDown
 } from 'lucide-react';
 import { useBIMStore } from './hooks/useBIMStore';
 import { BIMElement, BIMProjectState, CONTEXT_REFS, LintIssue, DiffEntry } from './services/api';
@@ -607,6 +607,37 @@ function App() {
                     <div className="card-header">
                         <Box size={14} className="card-icon" />
                         <h3>Project Overview</h3>
+                        {/* New Export Button */}
+                        {project && (
+                            <button
+                                className="icon-btn-sm"
+                                title="Export to Revit (IFC)"
+                                onClick={async () => {
+                                    try {
+                                        const res = await fetch('http://localhost:25678/project/export/ifc', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify(project)
+                                        });
+                                        if (res.ok) {
+                                            const blob = await res.blob();
+                                            const url = window.URL.createObjectURL(blob);
+                                            const a = document.createElement('a');
+                                            a.href = url;
+                                            a.download = `vesta_export_${project!.project_id}.ifc`;
+                                            a.click();
+                                        } else {
+                                            const txt = await res.text();
+                                            alert("Export failed: " + txt);
+                                        }
+                                    } catch (e) {
+                                        alert("Error exporting: " + e);
+                                    }
+                                }}
+                            >
+                                <FileDown size={14} />
+                            </button>
+                        )}
                     </div>
                     {project ? (
                         <>

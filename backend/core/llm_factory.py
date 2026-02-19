@@ -32,8 +32,16 @@ class LLMProvider(str, Enum):
 
 # Default model names per provider
 DEFAULT_MODELS: Dict[LLMProvider, str] = {
-    LLMProvider.GROQ: "meta-llama/llama-4-scout-17b-16e-instruct",
+    LLMProvider.GROQ: "llama-3.3-70b-versatile", # Best general purpose
     LLMProvider.GEMINI: "gemini-2.0-flash",
+}
+
+# Agent-specific Model Best Practices
+AGENT_MODELS: Dict[str, str] = {
+    "vision": "meta-llama/llama-4-scout-17b-16e-instruct", # Multimodal support
+    "stylist": "llama-3.3-70b-versatile", # High reasoning
+    "compliance": "llama-3.3-70b-versatile", # High reasoning
+    "orchestrator": "llama-3.1-8b-instant", # Fast routing
 }
 
 # Provider-specific API key env vars
@@ -58,9 +66,16 @@ class LLMConfig:
 
     def get_model_for(self, agent_name: Optional[str] = None, provider: Optional[LLMProvider] = None) -> str:
         """Get the model name for a specific agent."""
+        # 1. Manual override
         if agent_name and agent_name in self.model_overrides:
             return self.model_overrides[agent_name]
+        
+        # 2. Provider-specific intelligent defaults
         p = provider or self.get_provider_for(agent_name)
+        if p == LLMProvider.GROQ and agent_name in AGENT_MODELS:
+            return AGENT_MODELS[agent_name]
+            
+        # 3. Global default
         return DEFAULT_MODELS[p]
 
 

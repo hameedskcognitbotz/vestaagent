@@ -54,54 +54,86 @@ class ComplianceAgent:
         violations = []
         passed_symbolic = set()
         
-        # 1. Symbolic Check: Furniture near entry
-        for element in project.elements:
-            if element.type == ObjectType.FURNITURE:
-                dist = math.sqrt(element.position.x**2 + element.position.z**2)
-                if dist < 1.0:
-                    violations.append(ComplianceViolation(
-                        element_id=element.id,
-                        rule_id="ADA-404.2.3",
-                        severity="critical",
-                        description="Furniture placed in the maneuvering clearance zone for the entry door.",
-                        remediation_advice="Move item at least 1.2m away from the door swing arc."
-                    ))
-        
-        # 2. Symbolic Check: Door Width Verification
+        # 1. Symbolic Check: Furniture near Doors (Clearance Zone)
         doors = [e for e in project.elements if e.type == ObjectType.DOOR]
+        furniture = [e for e in project.elements if e.type == ObjectType.FURNITURE]
+        
+        for door in doors:
+            for item in furniture:
+                # Euclidean distance on XZ plane
+                dx = door.position.x - item.position.x
+                dz = door.position.z - item.position.z
+                dist = math.sqrt(dx*dx + dz*dz)
+                
+                # Rule: 36 inches approx 0.9144 meters
+                min_dist = 0.9144
+                if dist < min_dist:
+                    violations.append(ComplianceViolation(
+                        element_id=item.id,
+                        rule_id="ADA-404.2.4",
+                        severity="critical",
+                        description=f"Furniture '{item.metadata.get('name', item.type)}' is within {dist:.2f}m of Door {door.id} (Min: {min_dist:.2f}m).",
+                        remediation_advice=f"Move item at least {min_dist - dist:.2f}m away from the door."
+                    ))
+
+        # 2. Symbolic Check: Door Width Verification
         all_doors_pass = True
         for door in doors:
-            if door.dimensions.x < self.rules["MIN_DOOR_CLEARANCE"]:
+            # Assuming x is width. If rotation is 90, z might be width, but standardizing on dimension.x for now
+            width = door.dimensions.x
+            if width < self.rules["MIN_DOOR_CLEARANCE"]:
                 all_doors_pass = False
                 violations.append(ComplianceViolation(
                     element_id=door.id,
                     rule_id="ADA-404.2.3",
                     severity="critical",
-                    description=f"Door {door.id} width ({door.dimensions.x:.2f}m) is below ADA minimum ({self.rules['MIN_DOOR_CLEARANCE']}m).",
+                    description=f"Door {door.id} width ({width:.2f}m) is below ADA minimum ({self.rules['MIN_DOOR_CLEARANCE']}m).",
                     remediation_advice=f"Widen door to at least {self.rules['MIN_DOOR_CLEARANCE']}m."
                 ))
         if all_doors_pass and doors:
             passed_symbolic.add("ADA-404.2.3")
         
-        # 3. Symbolic Check: Egress Paths (need at least 2 doors for multi-egress)
+        # 3. Symbolic Check: Budget Constraints
+        # Assuming project_limit is passed in style_profile or metadata; defaulting to 50k if not set
+        budget_limit = project.style_profile.get("budget_limit", 50000.0)
+        if project.budget_total > budget_limit:
+             violations.append(ComplianceViolation(
+                element_id="project-budget",
+                rule_id="BUDGET-001",
+                severity="warning", # Usually warning unless strict
+                description=f"Total budget ${project.budget_total:.2f} exceeds limit ${budget_limit:.2f}.",
+                remediation_advice="Replace items with lower-cost alternatives."
+            ))
+
+        # 4. Symbolic Check: Egress Paths (need at least 2 doors for multi-egress)
         if len(doors) >= 2:
             passed_symbolic.add("IBC-1005.1")
         elif len(doors) == 1:
+            # Not necessarily a violation for small apartments, checking area > 50m2 maybe?
+            # Keeping as warning for now
             violations.append(ComplianceViolation(
                 element_id="",
                 rule_id="IBC-1005.1",
                 severity="warning",
-                description=f"Only {len(doors)} door(s) detected. Multi-egress requires at least 2 separate exit paths.",
-                remediation_advice="Verify additional exit paths exist (may not be detected from floor plan)."
+                description=f"Only {len(doors)} door(s) detected. Large spaces may require 2 exits.",
+                remediation_advice="Verify occupancy load."
             ))
         
-        # 4. Symbolic Check: Furniture Density
+        # 5. Symbolic Check: Furniture Density
         walls = [e for e in project.elements if e.type == ObjectType.WALL]
-        furniture = [e for e in project.elements if e.type == ObjectType.FURNITURE]
         if walls:
-            room_area = max(e.dimensions.x for e in walls) * max(e.dimensions.z if e.dimensions.z > 1 else e.dimensions.x for e in walls)
+            # Simplistic bounding box area
+            min_x = min((e.position.x for e in walls), default=0)
+            max_x = max((e.position.x for e in walls), default=0)
+            min_z = min((e.position.z for e in walls), default=0)
+            max_z = max((e.position.z for e in walls), default=0)
+            
+            room_area = (max_x - min_x) * (max_z - min_z)
+            if room_area == 0: room_area = 1 # avoid div/0
+            
             furniture_area = sum(e.dimensions.x * e.dimensions.z for e in furniture)
-            if room_area > 0 and (furniture_area / room_area) > self.rules["MAX_FURNITURE_DENSITY"]:
+            
+            if (furniture_area / room_area) > self.rules["MAX_FURNITURE_DENSITY"]:
                 violations.append(ComplianceViolation(
                     element_id="",
                     rule_id="IBC-1003.2",

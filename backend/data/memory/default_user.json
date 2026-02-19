@@ -326,6 +326,258 @@
       "event": "Material sourcing",
       "decision": "sourced",
       "reasoning": "Found 3 products. Total Budget: $1500.00"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout generation",
+      "decision": "multiple iterations",
+      "reasoning": "Compliance issues with furniture distance from doors"
+    },
+    {
+      "timestamp": "now",
+      "event": "Compliance check",
+      "decision": "Rejected multiple times",
+      "reasoning": "Critical violations of furniture distance from doors"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout approval",
+      "decision": "Proceeded with caution",
+      "reasoning": "Max Persistence reached, proceeding despite violations"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout generation",
+      "decision": "multiple iterations",
+      "reasoning": "Compliance issues"
+    },
+    {
+      "timestamp": "now",
+      "event": "Compliance check",
+      "decision": "Rejected",
+      "reasoning": "ADA minimum door width not met"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout persistence",
+      "decision": "Proceeding",
+      "reasoning": "Max Persistence reached"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout generation",
+      "decision": "multiple iterations",
+      "reasoning": "Improving flow score and compliance"
+    },
+    {
+      "timestamp": "now",
+      "event": "Compliance check",
+      "decision": "Rejected multiple times",
+      "reasoning": "Furniture placement issues"
+    },
+    {
+      "timestamp": "now",
+      "event": "Product sourcing",
+      "decision": "Found 5 products",
+      "reasoning": "Within budget of $399.00"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout revision",
+      "decision": "requested",
+      "reasoning": "Spatial errors and ADA compliance issues"
+    },
+    {
+      "timestamp": "now",
+      "event": "Compliance check",
+      "decision": "rejected",
+      "reasoning": "Critical violations: furniture too close to door"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout revision",
+      "decision": "requested",
+      "reasoning": "Spatial errors and ADA compliance issues"
+    },
+    {
+      "timestamp": "now",
+      "event": "Compliance check",
+      "decision": "rejected",
+      "reasoning": "Critical violations: furniture too close to door"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout revision",
+      "decision": "requested",
+      "reasoning": "Spatial errors and ADA compliance issues"
+    },
+    {
+      "timestamp": "now",
+      "event": "Compliance check",
+      "decision": "failed but proceeding",
+      "reasoning": "Max Persistence reached"
+    },
+    {
+      "timestamp": "now",
+      "event": "Product sourcing",
+      "decision": "completed",
+      "reasoning": "Found 5 products within budget $399.00"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout compliance",
+      "decision": "rejected",
+      "reasoning": "Multiple ADA violations"
+    },
+    {
+      "timestamp": "now",
+      "event": "Door width compliance",
+      "decision": "rejected",
+      "reasoning": "Door widths below ADA minimum (0.81m)"
+    },
+    {
+      "timestamp": "now",
+      "event": "Furniture placement",
+      "decision": "revised",
+      "reasoning": "Furniture too close to doors"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout approval",
+      "decision": "pending",
+      "reasoning": "Proceeding with max persistence despite violations"
+    },
+    {
+      "timestamp": "now",
+      "event": "Spatial corrections and repositioning",
+      "decision": "requested",
+      "reasoning": "To meet ergonomic and ADA standards"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout compliance check",
+      "decision": "rejected multiple times",
+      "reasoning": "Due to multiple critical violations (e.g., furniture proximity to doors, door width below ADA minimum)"
+    },
+    {
+      "timestamp": "now",
+      "event": "Proceeding with violations",
+      "decision": "proceeded",
+      "reasoning": "Max Persistence reached, proceeding despite violations"
+    },
+    {
+      "timestamp": "now",
+      "event": "Layout revision",
+      "decision": "approved",
+      "reasoning": "Met ergonomic and ADA standards"
+    },
+    {
+      "timestamp": "now",
+      "event": "Compliance check",
+      "decision": "passed",
+      "reasoning": "No critical issues found"
+    },
+    {
+      "timestamp": "now",
+      "event": "Compliance Check",
+      "decision": "rejected",
+      "reasoning": "ADA minimum door width violations"
+    },
+    {
+      "timestamp": "now",
+      "event": "Flow Score Evaluation",
+      "decision": "scored 40.0/100",
+      "reasoning": "Spatial Engine evaluation"
+    },
+    {
+      "timestamp": "now",
+      "event": "Product Sourcing",
+      "decision": "found 0 products",
+      "reasoning": "No products found within budget or criteria"
+    },
+    {
+      "timestamp": "now",
+      "event": "Interior Layout Generation",
+      "decision": "failed",
+      "reasoning": "No valid design JSON found in model response; unable to determine optimal furniture arrangement."
+    },
+    {
+      "timestamp": "now",
+      "event": "Compliance Check",
+      "decision": "rejected",
+      "reasoning": "Door door-cbfff2 width (0.79 m) is below ADA minimum (0.81 m)."
+    },
+    {
+      "timestamp": "now",
+      "event": "Compliance Override",
+      "decision": "proceeding",
+      "reasoning": "Max persistence reached; proceeding despite critical violation."
+    },
+    {
+      "timestamp": "now",
+      "event": "Product Sourcing",
+      "decision": "none",
+      "reasoning": "Found 0 products; total budget $0.00."
+    },
+    {
+      "timestamp": "now",
+      "event": "Compliance check",
+      "decision": "rejected",
+      "reasoning": "Door door-999b61 width (0.80m) is below ADA minimum (0.81m)"
+    },
+    {
+      "timestamp": "now",
+      "event": "Revision request",
+      "decision": "requested",
+      "reasoning": "Critical violation in door width requires design revision"
+    },
+    {
+      "timestamp": "now",
+      "event": "Max persistence continuation",
+      "decision": "proceeded",
+      "reasoning": "System allowed continuation despite critical violation due to max persistence setting"
+    },
+    {
+      "timestamp": "now",
+      "event": "Sourcing",
+      "decision": "no products found",
+      "reasoning": "Budget $0.00 resulted in zero matching products"
+    },
+    {
+      "timestamp": "now",
+      "event": "Compliance check",
+      "decision": "passed",
+      "reasoning": "No critical issues found"
+    },
+    {
+      "timestamp": "now",
+      "event": "Spatial analysis",
+      "decision": "optimal",
+      "reasoning": "Flow Score: 100.0/100 with 0 auto-corrections applied"
+    },
+    {
+      "timestamp": "now",
+      "event": "Sourcing products",
+      "decision": "no products found",
+      "reasoning": "Total Budget: $0.00"
+    },
+    {
+      "timestamp": "now",
+      "event": "Compliance Check",
+      "decision": "rejected",
+      "reasoning": "Door width below ADA minimum"
+    },
+    {
+      "timestamp": "now",
+      "event": "Revision Request",
+      "decision": "requested",
+      "reasoning": "Door width below ADA minimum"
+    },
+    {
+      "timestamp": "now",
+      "event": "Max Persistence Triggered",
+      "decision": "proceeded",
+      "reasoning": "Failed compliance check"
     }
   ],
   "style_dna": {}

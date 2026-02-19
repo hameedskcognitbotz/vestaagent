@@ -567,6 +567,10 @@ class SpatialEngine:
     #  6. COLLISION RESOLUTION (Auto-Fix)
     # -----------------------------------------------------------------------
 
+    # -----------------------------------------------------------------------
+    #  6. COLLISION RESOLUTION (Auto-Fix)
+    # -----------------------------------------------------------------------
+
     def _resolve_collisions(self, project: BIMProjectState) -> List[SpatialIssue]:
         """Attempt to auto-fix furniture-furniture collisions by nudging."""
         issues = []
@@ -616,6 +620,60 @@ class SpatialEngine:
                         fix_description="Separated overlapping furniture along Z-axis."
                     ))
 
+        return issues
+        
+    # -----------------------------------------------------------------------
+    #  7. OUT OF BOUNDS & ROOM ASSIGNMENT 
+    # -----------------------------------------------------------------------
+    
+    def _is_point_in_polygon(self, x: float, z: float, polygon: List[Tuple[float, float]]) -> bool:
+        """Ray casting algorithm for point in polygon test."""
+        if not polygon: return False
+        n = len(polygon)
+        inside = False
+        p1x, p1z = polygon[0]
+        for i in range(n + 1):
+            p2x, p2z = polygon[i % n]
+            if z > min(p1z, p2z):
+                if z <= max(p1z, p2z):
+                    if x <= max(p1x, p2x):
+                        if p1z != p2z:
+                            xinters = (z - p1z) * (p2x - p1x) / (p2z - p1z) + p1x
+                        if p1x == p2x or x <= xinters:
+                            inside = not inside
+            p1x, p1z = p2x, p2z
+        return inside
+
+    def _check_bounds(self, project: BIMProjectState) -> List[SpatialIssue]:
+        """Check if furniture is floating outside any valid room polygon."""
+        issues = []
+        if not project.rooms:
+            return issues
+            
+        for fid, fbox in self._furniture:
+            cx, cz = fbox.center
+            in_any_room = False
+            assigned_room_id = None
+            
+            # Check containment
+            for room in project.rooms:
+                if self._is_point_in_polygon(cx, cz, room.polygon):
+                    in_any_room = True
+                    assigned_room_id = room.id
+                    break
+            
+            if not in_any_room:
+                 issues.append(SpatialIssue(
+                    severity="warning",
+                    issue_type="bounds",
+                    element_ids=[fid],
+                    description=f"Furniture {fid} is floating outside all defined room boundaries.",
+                    auto_fix_applied=False # Could implement snapping to nearest room center
+                ))
+            else:
+                 # Optional: Verify it matches explicitly assigned room if metadata exists
+                 pass
+                 
         return issues
 
     # -----------------------------------------------------------------------
@@ -675,6 +733,10 @@ class SpatialEngine:
         report.issues.extend(flow_issues)
         report.blocked_paths = len(flow_issues)
         report.nav_graph_nodes = nav_nodes
+        
+        # 6.5 Out of Bounds Check
+        bounds_issues = self._check_bounds(project)
+        report.issues.extend(bounds_issues)
 
         # 7. Density Analysis
         furniture_area, room_area, density = self._calculate_density()

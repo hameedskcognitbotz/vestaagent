@@ -1,6 +1,6 @@
 import base64
 import os
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 from langchain_core.messages import HumanMessage
 from backend.core.llm_factory import get_llm
 from backend.agents.vision.schema import VisionExtraction, DetectedWall, DetectedOpening
@@ -24,7 +24,7 @@ CRITICAL EXTRACTION RULES:
    - Look for ARC/SWING marks — quarter-circle arcs show door swing direction
    - Look for GAPS in walls where a door would be placed
    - Door widths: standard interior ~0.8m, bathroom ~0.7m, entry/exterior ~0.9m
-   - Set type to "door" for each
+   - Set type to "door" for type
    - Position should be at the center of the door opening
 
 3. WINDOWS — Extract ALL windows:
@@ -34,7 +34,10 @@ CRITICAL EXTRACTION RULES:
    - Set type to "window" for each
    - Position should be at the center of the window
 
-4. ROOMS — In notes, list every room label you see (e.g., "Master Bedroom", "Living Room", "Bath 1", "Kitchen", "Office", "Balcony"). Count them.
+4. ROOMS — Identify room boundaries (polygons):
+   - For each room (Living Room, Bedroom, Kitchen, Bath), define a CLOSED POLYGON of coordinates.
+   - The polygon should follow the inner face of the walls.
+   - List the room Name.
 
 Return ONLY a JSON object matching this schema:
 {
@@ -42,6 +45,9 @@ Return ONLY a JSON object matching this schema:
   "openings": [
     {"type": "door", "position": [2,0], "width": 0.9, "rotation": 0},
     {"type": "window", "position": [3,5], "width": 1.2, "rotation": 0}
+  ],
+  "rooms": [
+    {"name": "Master Bedroom", "polygon": [[0,0], [5,0], [5,5], [0,5]]}
   ],
   "scale_ratio": 1.0,
   "confidence_score": 0.9,
@@ -53,6 +59,7 @@ IMPORTANT:
 - Strictly ensure thickness and scores are numeric.
 - If you see door swing arcs (quarter circles), those are DOORS — extract them.
 - If you see parallel lines on outer walls, those are WINDOWS — extract them.
+- Ensure room polygons are closed loops (last point connects to first).
 """
 
 class VisionAgent:
@@ -120,7 +127,9 @@ class VisionAgent:
             return VisionExtraction(**data)
         except Exception as e:
             print(f"Vision refinement parsing failed: {e}. Data: {content[:200]}")
-            return self._generate_mock_extraction()
+            # Mock extraction for fallback testing
+            from backend.agents.vision.schema import DetectedWall
+            return VisionExtraction(walls=[DetectedWall(start=(0,0), end=(5,0))], confidence_score=0.1, notes="Refinement failed fallback.")
 
     async def process_plan(self, image_bytes: bytes) -> VisionExtraction:
         if self.use_custom and self.custom_agent:
@@ -146,7 +155,7 @@ class VisionAgent:
         system_msg = SystemMessage(content=VISION_SYSTEM_PROMPT)
         human_msg = HumanMessage(
             content=[
-                {"type": "text", "text": "Analyze this floor plan and extract the geometry JSON."},
+                {"type": "text", "text": "Analyze this floor plan and extract the geometry JSON including room polygons."},
                 {
                     "type": "image_url",
                     "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"},
@@ -186,11 +195,12 @@ class VisionAgent:
             if "scale" in data and "scale_ratio" not in data:
                 data["scale_ratio"] = data["scale"]
 
-            # CRITICAL FIX: If we have walls, return them even if Pydantic is strict about other fields
+             # CRITICAL FIX: If we have walls, return them even if Pydantic is strict about other fields
             if "walls" in data and isinstance(data["walls"], list) and len(data["walls"]) > 0:
                 print(f"SUCCESS: Extracted {len(data['walls'])} walls from Vision Agent.")
-                # Ensure other fields exist to satisfy Pydantic
+                # Ensure fields exist
                 if "openings" not in data: data["openings"] = []
+                if "rooms" not in data: data["rooms"] = []
                 if "scale_ratio" not in data: data["scale_ratio"] = 1.0
                 if "confidence_score" not in data: data["confidence_score"] = 0.8
                 return VisionExtraction(**data)
@@ -200,25 +210,14 @@ class VisionAgent:
             print(f"Vision parsing error: {e}")
             print(f"RAW CONTENT WAS: {content}")
             
-            # Last ditch effort: try to recover walls from the raw dictionary if possible
-            try:
-                if isinstance(data, dict) and "walls" in data:
-                    print("Recovering partial wall data from failed validation...")
-                    return VisionExtraction(
-                        walls=[DetectedWall(**w) for w in data["walls"]],
-                        openings=[],
-                        confidence_score=0.5,
-                        notes="Recovered from partial extraction."
-                    )
-            except:
-                pass
-
-            # NO MORE MOCK FALLBACK: Raise exception so orchestrator can notify user
             raise ValueError(f"Spatial Extraction Failed: {str(e)}. The model could not interpret this floor plan geometry accurately.")
 
 
-def map_extraction_to_bim(extraction: VisionExtraction) -> List[BIMElement]:
-    """Converts 2D detection into 3D BIM elements (initial extrusion)."""
+def map_extraction_to_bim(extraction: VisionExtraction) -> Tuple[List[BIMElement], List[Any]]:
+    """
+    Converts 2D detection into 3D BIM elements (initial extrusion) AND Room objects.
+    Returns: (elements, rooms)
+    """
     elements = []
     
     # Process Walls
@@ -236,7 +235,7 @@ def map_extraction_to_bim(extraction: VisionExtraction) -> List[BIMElement]:
         elements.append(BIMElement(
             id=f"wall-{uuid.uuid4().hex[:6]}",
             type=ObjectType.WALL,
-            position=Vector3(x=center_x, y=1, z=center_y),
+            position=Vector3(x=center_x, y=1.4, z=center_y),
             rotation=Vector3(x=0, y=angle, z=0),
             dimensions=Vector3(x=length, y=2.8, z=w.thickness),
             metadata={"load_bearing": w.is_load_bearing}
@@ -266,8 +265,19 @@ def map_extraction_to_bim(extraction: VisionExtraction) -> List[BIMElement]:
             dimensions=Vector3(x=o.width, y=height, z=0.1),
             metadata={"opening_type": o.type}
         ))
+        
+    # Process Rooms
+    from backend.core.bim_state import Room
+    rooms = []
+    for r in extraction.rooms:
+        rooms.append(Room(
+            id=f"room-{uuid.uuid4().hex[:6]}",
+            name=r.name,
+            polygon=r.polygon,
+            elements=[]
+        ))
     
-    return elements
+    return elements, rooms
 
 
 def count_rooms_from_notes(extraction: VisionExtraction) -> int:

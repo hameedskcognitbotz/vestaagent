@@ -8,24 +8,35 @@ from backend.agents.stylist.schema import StylistDesign, FurnitureRecommendation
 from backend.core.bim_state import BIMProjectState, BIMElement, ObjectType, Vector3
 
 STYLIST_SYSTEM_PROMPT = """
-You are the 'Stylist Agent' for VestaCode. Your expertise is in interior architecture and 
-ergonomic layout planning.
+You are the Lead Interior Architect for VestaCode, a "Cursor for Spatial Design" platform.
+Your goal is to transform 2D spatial coordinates into a high-fidelity 3D BIM state.
 
-Your Goal:
-Given a 3D BIM state (walls and rooms), populate the space with furniture and materials.
+CRITICAL DESIGN RULES:
 
-Rules of Interior Design:
-1. Ergonomics: Ensure clear walking paths (minimum 36 inches/0.9m). 
-2. Flow: Do not place furniture directly in front of doors or windows.
-3. Aesthetic Cohesion: Follow the provided 'Design DNA'.
-4. Scale: Ensure furniture dimensions are realistic (e.g., King bed is ~2m x 2m).
-
-Input:
-- BIM State (Existing walls, doors, windows).
-- Style Profile (Theme, colors).
+1. **Analyze Reference:** Use the `@Style` profile and `@Memory` to identify preferred materials (e.g., 'Scandinavian Oak', 'Matte Black Steel').
+2. **Object Matching:** For every room, select specific furniture types that fit the function.
+   - Bedroom: Bed (King/Queen), Nightstands, Wardrobe.
+   - Living: Sofa (L-Shape/Sectional), Coffee Table, TV Unit.
+   - Dining: Dining Table, Chairs (4-6).
+   - Kitchen: Cabinets, Island (if space allows).
+3. **Smart Alignment:** 
+   - Ensure the back of seating faces the wall.
+   - Leave a minimum 36" (0.9m) clearance for walkways (Reference: `Compliance_Linter`).
+   - Center major pieces (Beds, Dining Tables) within their room polygons.
+4. **Custom Millwork (SketchUp Level Detail):**
+   - **Integrated Study:** If a bedroom wall has a window, design a "Study Niche" intersecting the wardrobe.
+   - **Built-ins:** Prefer floor-to-ceiling wardrobes over standalone units for a premium look.
+   - **Dimensions:** Use precise millimeters for joinery (e.g., depth 600mm for wardrobes).
+5. **SketchUp Compatibility (3D Warehouse):**
+   - Use standard component names found in the SketchUp 3D Warehouse (e.g., "Eames Lounge Chair & Ottoman", "IKEA Billy Bookcase").
+   - This allows automated replacement with high-fidelity models.
+6. **Constraint Logic:** 
+   - You MUST respect the `Room Polygons` provided. 
+   - If a placement violates a wall boundary found by the `Vision_Agent`, you MUST adjust the rotation or scale.
+   - Do NOT place furniture in "Undefined" space.
 
 Output:
-A JSON object matching the StylistDesign schema.
+A JSON object matching the StylistDesign schema, with detailed `item_type` names (e.g., "Custom Integrated Wardrobe", "Eames Lounge Chair").
 """
 
 class StylistAgent:
@@ -49,6 +60,11 @@ class StylistAgent:
             for e in project.elements if e.type == ObjectType.WINDOW
         ]
         
+        room_summary = [
+            f"Room {r.name}: Polygon Points ({len(r.polygon)})"
+            for r in project.rooms
+        ]
+        
         furniture_summary = [
             f"Furniture {e.id}: {e.metadata.get('item_type')} at ({e.position.x}, {e.position.z})"
             for e in project.elements if e.type == ObjectType.FURNITURE
@@ -58,7 +74,7 @@ class StylistAgent:
         n_walls = len(wall_summary)
         n_doors = len(door_summary)
         # Heuristic: rooms ≈ (interior walls) / 2, minimum 2
-        estimated_rooms = max(n_doors, max(n_walls // 3, 2))
+        estimated_rooms = len(project.rooms) if project.rooms else max(n_doors, max(n_walls // 3, 2))
         min_furniture = max(estimated_rooms * 2, 5)  # At least 2 items per room, minimum 5
 
         # Extract relevant memory
@@ -70,9 +86,8 @@ class StylistAgent:
         Walls ({len(wall_summary)}): {json.dumps(wall_summary, indent=2)}
         Doors ({len(door_summary)}): {json.dumps(door_summary, indent=2)}
         Windows ({len(window_summary)}): {json.dumps(window_summary, indent=2)}
+        Rooms ({len(room_summary)}): {json.dumps(room_summary, indent=2)} (Use these polygons as containers!)
         Existing Furniture: {json.dumps(furniture_summary, indent=2)}
-        
-        Estimated Rooms: {estimated_rooms}
         
         Client Preferences & History:
         - Preferences: {json.dumps([p for p in preferences], indent=2)}
@@ -93,7 +108,9 @@ class StylistAgent:
               "rotation": {{"x": 0, "y": 0, "z": 0}},
               "style_tag": "Modern",
               "reasoning": "Placed along the east wall for optimal flow.",
-              "estimated_cost": 1200.0
+              "estimated_cost": 1200.0,
+              "model_url": "https://assets.vestacode.ai/models/sofa_modern_01.glb",
+              "material_properties": {{"finish": "Scandinavian Oak", "texture": "matte", "color": "#8B4513"}}
             }}
           ],
           "palette": {{
@@ -105,13 +122,12 @@ class StylistAgent:
         }}
         
         CRITICAL RULES:
-        1. You MUST include at least {min_furniture} furniture items in "recommendations" (this is a {estimated_rooms}-room layout).
-        2. Each item MUST have: "item_type" (descriptive name like "King Bed", "Dining Table", "Office Desk", "Floor Lamp"), "position" (x,y,z), "dimensions" (x,y,z in meters).
-        3. Furniture must fit within the walls. Use the wall coordinates to determine room boundaries.
-        4. DO NOT place furniture blocking doors or windows. Keep at least 1.0m clearance from door positions.
-        5. For bedrooms: include Bed + Nightstand. For living rooms: Sofa + Coffee Table. For dining: Table + Chairs. For office: Desk + Chair.
-        6. Return ONLY valid JSON. No markdown, no explanations outside the JSON.
-        7. Respect the client's preferences (likes/hates) and past history.
+        1. You MUST include at least {min_furniture} furniture items in "recommendations".
+        2. Each item MUST have: "item_type", "position" (x,y,z), "dimensions" (x,y,z in meters), and a mock "model_url".
+        3. Furniture must fit within the *Room Polygons*.
+        4. DO NOT place furniture blocking doors or windows.
+        5. For Millwork (Wardrobes/Kitchens), SPECIFY "material_properties" (e.g. Oak Veneer) to match the high-end SketchUp aesthetic.
+        6. Return ONLY valid JSON.
         """
 
         # 2. Call LLM
@@ -304,12 +320,17 @@ def apply_design_to_bim(design: StylistDesign, project: BIMProjectState) -> BIMP
 
     # 2. Add new recommendations
     for rec in design.recommendations:
+        # Snap to floor: y = height/2
+        safe_y = rec.dimensions.get("y", 1.0) / 2
+        
         project.elements.append(BIMElement(
             id=f"furniture-{uuid.uuid4().hex[:6]}",
             type=ObjectType.FURNITURE,
-            position=rec.position,
+            position=Vector3(x=rec.position["x"], y=safe_y, z=rec.position["z"]),
             rotation=rec.rotation,
             dimensions=rec.dimensions,
+            model_url=rec.model_url,
+            material_properties=rec.material_properties or {},
             metadata={
                 "item_type": rec.item_type,
                 "reasoning": rec.reasoning,

@@ -10,6 +10,8 @@ class FurnitureRecommendation(BaseModel):
     dimensions: Vector3
     reasoning: str  # Why did the agent place it here? (Ergonomic rationale)
     estimated_cost: float
+    model_url: Optional[str] = None
+    material_properties: Optional[Dict[str, Any]] = None # e.g. {"finish": "Oak", "texture": "matte"}
 
 class MaterialPalette(BaseModel):
     wall_color: str

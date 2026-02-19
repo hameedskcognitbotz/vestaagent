@@ -20,61 +20,58 @@ if os.path.exists(KB_PATH):
 else:
     STATIC_KNOWLEDGE = {"building_codes": {}, "material_science": {}}
 
+from backend.agents.context.agent import ContextAgent
+
 memory_manager = MemoryManager()
-
-# Helper: Context Resolver
-def resolve_context_references(message: str, project: BIMProjectState) -> str:
-    """Detects @ references and appends relevant context data to the prompt."""
-    if not message: return message
-    
-    context_injection = "\n\n[VESTACODE CONTEXT REFERENCES]:"
-    found_ref = False
-
-    if "@Code" in message:
-        found_ref = True
-        codes = STATIC_KNOWLEDGE.get("building_codes", {})
-        context_injection += f"\n- @Code: Building Regulations Active: {json.dumps(codes)}"
-    
-    if "@Budget" in message:
-        found_ref = True
-        context_injection += f"\n- @Budget: Current Total: ${project.budget_total:.2f}. Constraints: Maximize value/cost ratio."
-    
-    if "@FloorPlan" in message:
-        found_ref = True
-        wall_count = len([e for e in project.elements if e.type == ObjectType.WALL])
-        context_injection += f"\n- @FloorPlan: Existing geometry contains {wall_count} walls. Focus on structural alignment."
-        
-    if "@Style" in message:
-        found_ref = True
-        style = project.style_profile or {"theme": "Japandi Modern"}
-        context_injection += f"\n- @Style: Active Style DNA: {json.dumps(style)}"
-
-    return message + (context_injection if found_ref else "")
+context_agent = ContextAgent()
 
 # Define the Nodes
+async def context_enrichment_node(state: AgentState):
+    print("--- 🧠 CONTEXT: RESOLVING REFERENCES ---")
+    project = state["project"]
+    user_msg = state.get("user_message") or ""
+    
+    # Run the new ContextAgent
+    result = await context_agent.run(project, user_msg)
+    
+    # Append the enriched context to the user message for downstream agents
+    enriched_msg = user_msg + result["context_str"]
+    
+    # Update active selection if resolved
+    if result["resolution"]["target_elements"]:
+        project.active_selection = [e.id for e in result["resolution"]["target_elements"]]
+        
+    return {
+        "project": project,
+        "user_message": enriched_msg,
+        "next_agent": "vision" # Default next step, though graph logic controls flow
+    }
+
 async def vision_node(state: AgentState):
     print("--- 🔍 VISION: ANALYZING/REFINING STRUCTURE ---")
     vision = VisionAgent()
     image = state.get("plan_image")
-    user_msg = state.get("user_message")
+    # Message is already enriched by context node
+    enriched_msg = state.get("user_message") 
     project = state["project"]
-
-    # Resolve @refs early
-    enriched_msg = resolve_context_references(user_msg, project)
 
     try:
         if image:
             # Initial upload
             extraction = await vision.process_plan(image)
-            elements = map_extraction_to_bim(extraction)
+            elements, rooms = map_extraction_to_bim(extraction)
             project.elements.extend(elements)
+            project.rooms = rooms # Overwrite rooms on new upload
         elif enriched_msg and any(k in enriched_msg.lower() or "@" in enriched_msg for k in ["wall", "room", "door", "structure", "move", "remove"]):
             # Structural refinement via chat
             extraction = await vision.refine_structure(project, enriched_msg)
-            elements = map_extraction_to_bim(extraction)
+            elements, rooms = map_extraction_to_bim(extraction)
             # Clear old walls before adding refined ones
             project.elements = [e for e in project.elements if e.type != ObjectType.WALL]
             project.elements.extend(elements)
+            # Update rooms if any returned
+            if rooms:
+                project.rooms = rooms
         else:
             # Skip vision for non-structural messages
             return {"project": project, "next_agent": "stylist"}
@@ -89,7 +86,7 @@ async def vision_node(state: AgentState):
         print(f"Vision Node Error: {e}")
         return {
             "project": project,
-            "next_agent": END, # Stop the pipeline if we can't extract geometry
+            "next_agent": END, 
             "messages": [{"role": "assistant", "content": f"[ERROR]: {str(e)}"}]
         }
 
@@ -99,9 +96,8 @@ async def stylist_node(state: AgentState):
     project = state["project"]
     style_profile = project.style_profile or {"theme": "Japandi Modern"}
     
-    # Inject Memory Layer
     memory = state.get("long_term_memory")
-    user_msg = resolve_context_references(state.get("user_message"), project)
+    user_msg = state.get("user_message")
     
     try:
         design = await stylist.generate_layout(project, style_profile, user_message=user_msg, memory=memory)
@@ -161,29 +157,38 @@ async def compliance_node(state: AgentState):
     print("--- 🛡️ COMPLIANCE: VERIFYING REGULATIONS ---")
     compliance = ComplianceAgent()
     project = state["project"]
-    
-    # Inject Knowledge Layer (Building Codes)
     knowledge = state.get("semantic_knowledge")
-    user_msg = state.get("user_message")
-    
-    # If @Code is mentioned, ensure compliance agent is extra strict
-    if user_msg and "@Code" in user_msg:
-        print("   -> Explicit @Code reference detected. Running deep audit.")
     
     report = await compliance.check_compliance(project, knowledge=knowledge)
     updated_project = process_compliance_node(project, report)
+    
+    # Decide next step based on compliance
+    if report.is_compliant:
+        next_step = "sourcing"
+        msg = f"[Compliance]: Passed. {report.summary}"
+    else:
+        # Check loop count to avoid infinite loops
+        current_loops = state.get("loop_count", 0)
+        if current_loops < 3:
+            print(f"   -> Compliance Failed. Looping back to Stylist (Attempt {current_loops+1}/3)")
+            next_step = "stylist"
+            msg = f"[Compliance]: Rejected. {report.summary}. Requesting revision."
+        else:
+            print("   -> Max loops reached. Proceeding with warnings.")
+            next_step = "sourcing"
+            msg = f"[Compliance]: Failed but proceeding (Max Persistence). {report.summary}"
+            
     return {
         "project": updated_project, 
-        "next_agent": "sourcing", 
-        "messages": [{"role": "assistant", "content": f"[Compliance]: {report.summary}"}]
+        "next_agent": next_step, 
+        "messages": [{"role": "assistant", "content": msg}],
+        "loop_count": state.get("loop_count", 0) + 1
     }
 
 async def sourcing_node(state: AgentState):
     print("--- 🛒 SOURCING: FINDING REAL PRODUCTS ---")
     sourcing = SourcingAgent()
     project = state["project"]
-    
-    # Inject Knowledge Layer (Material Science)
     knowledge = state.get("semantic_knowledge")
     
     report = await sourcing.search_products(project, knowledge=knowledge)
@@ -222,6 +227,7 @@ async def memory_refinery_node(state: AgentState):
 # Define the Graph
 workflow = StateGraph(AgentState)
 
+workflow.add_node("context_enrichment", context_enrichment_node)
 workflow.add_node("vision", vision_node)
 workflow.add_node("stylist", stylist_node)
 workflow.add_node("spatial_validation", spatial_validation_node)
@@ -229,12 +235,29 @@ workflow.add_node("compliance", compliance_node)
 workflow.add_node("sourcing", sourcing_node)
 workflow.add_node("memory_refinery", memory_refinery_node)
 
-workflow.set_entry_point("vision")
+workflow.set_entry_point("context_enrichment")
 
+workflow.add_edge("context_enrichment", "vision")
 workflow.add_edge("vision", "stylist")
 workflow.add_edge("stylist", "spatial_validation")
 workflow.add_edge("spatial_validation", "compliance")
-workflow.add_edge("compliance", "sourcing")
+
+# Conditional Edge for Compliance Loop
+def should_continue_compliance(state: AgentState):
+    last_msg = state["messages"][-1]["content"] if state["messages"] else ""
+    if "Rejected" in last_msg and state.get("loop_count", 0) <= 3:
+        return "retry"
+    return "proceed"
+
+workflow.add_conditional_edges(
+    "compliance",
+    should_continue_compliance,
+    {
+        "retry": "stylist",
+        "proceed": "sourcing"
+    }
+)
+
 workflow.add_edge("sourcing", "memory_refinery")
 workflow.add_edge("memory_refinery", END)
 

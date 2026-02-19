@@ -19,6 +19,9 @@ class AgentState(TypedDict):
     # User intent
     user_message: Optional[str]
     
+    # Loop prevention
+    loop_count: int = 0
+    
     # Raw data from vision
     plan_image: Optional[bytes]
     extraction_results: Optional[Dict[str, Any]]

@@ -1,0 +1,1 @@
+from backend.core.ifc_compiler import IFCCompiler\nfrom backend.core.bim_state import BIMProjectState\n\nclass RevitExportAgent:\n    def __init__(self):\n        pass\n\n    def export(self, project: BIMProjectState) -> str:\n        compiler = IFCCompiler(project)\n        path = f'/tmp/vesta_export_{project.project_id}.ifc'\n        compiler.compile(path)\n        return path

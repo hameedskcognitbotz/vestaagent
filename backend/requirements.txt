@@ -13,3 +13,4 @@ httpx
 numpy
 scipy
 trimesh  # For backend geometry processing
+ifcopenshell

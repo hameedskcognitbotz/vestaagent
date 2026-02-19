@@ -13,9 +13,14 @@ class DetectedOpening(BaseModel):
     width: float = 1.0
     rotation: float = 0.0
 
+class DetectedRoom(BaseModel):
+    name: str
+    polygon: List[Tuple[float, float]]
+
 class VisionExtraction(BaseModel):
     walls: List[DetectedWall]
     openings: List[DetectedOpening] = Field(default_factory=list)
+    rooms: List[DetectedRoom] = Field(default_factory=list)
     scale_ratio: float = 1.0  # pixels to meters
     confidence_score: float = 0.0
     notes: Optional[str] = None
