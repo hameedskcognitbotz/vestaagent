@@ -32,16 +32,16 @@ class LLMProvider(str, Enum):
 
 # Default model names per provider
 DEFAULT_MODELS: Dict[LLMProvider, str] = {
-    LLMProvider.GROQ: "llama-3.3-70b-versatile", # Best general purpose
-    LLMProvider.GEMINI: "gemini-2.0-flash",
+    LLMProvider.GROQ: "llama-3.3-70b-versatile",
+    LLMProvider.GEMINI: "gemini-3-flash-preview",
 }
 
-# Agent-specific Model Best Practices
+# Agent-specific Model Best Practices (Hybrid 3.1 Strategy)
 AGENT_MODELS: Dict[str, str] = {
-    "vision": "meta-llama/llama-4-scout-17b-16e-instruct", # Multimodal support
-    "stylist": "llama-3.3-70b-versatile", # High reasoning
-    "compliance": "llama-3.3-70b-versatile", # High reasoning
-    "orchestrator": "llama-3.1-8b-instant", # Fast routing
+    "vision": "gemini-3-flash-preview", # High-speed Agentic Vision
+    "stylist": "gemini-3-flash-preview", # Creative iteration speed
+    "compliance": "gemini-3.1-pro-preview", # Deep reasoning for building codes
+    "orchestrator": "gemini-3.1-pro-preview", # Complex routing/graph management
 }
 
 # Provider-specific API key env vars
@@ -54,7 +54,7 @@ API_KEY_VARS: Dict[LLMProvider, str] = {
 @dataclass
 class LLMConfig:
     """Global LLM configuration state."""
-    default_provider: LLMProvider = LLMProvider.GROQ
+    default_provider: LLMProvider = LLMProvider.GEMINI
     agent_overrides: Dict[str, LLMProvider] = field(default_factory=dict)
     model_overrides: Dict[str, str] = field(default_factory=dict)  # agent_name -> model
 
@@ -72,7 +72,7 @@ class LLMConfig:
         
         # 2. Provider-specific intelligent defaults
         p = provider or self.get_provider_for(agent_name)
-        if p == LLMProvider.GROQ and agent_name in AGENT_MODELS:
+        if agent_name in AGENT_MODELS:
             return AGENT_MODELS[agent_name]
             
         # 3. Global default

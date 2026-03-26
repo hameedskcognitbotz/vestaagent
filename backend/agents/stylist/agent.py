@@ -321,12 +321,12 @@ def apply_design_to_bim(design: StylistDesign, project: BIMProjectState) -> BIMP
     # 2. Add new recommendations
     for rec in design.recommendations:
         # Snap to floor: y = height/2
-        safe_y = rec.dimensions.get("y", 1.0) / 2
+        safe_y = rec.dimensions.y / 2
         
         project.elements.append(BIMElement(
             id=f"furniture-{uuid.uuid4().hex[:6]}",
             type=ObjectType.FURNITURE,
-            position=Vector3(x=rec.position["x"], y=safe_y, z=rec.position["z"]),
+            position=Vector3(x=rec.position.x, y=safe_y, z=rec.position.z),
             rotation=rec.rotation,
             dimensions=rec.dimensions,
             model_url=rec.model_url,

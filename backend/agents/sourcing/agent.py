@@ -26,6 +26,18 @@ class SourcingAgent:
             "coffee_table": [
                 {"name": "Noguchi Table", "vendor": "Herman Miller", "price": 895.0, "url": "https://hermanmiller.com/noguchi"},
                 {"name": "Mid-Century Table", "vendor": "West Elm", "price": 399.0, "url": "https://westelm.com/mid-century"}
+            ],
+            "bed": [
+                {"name": "Andes Bed", "vendor": "West Elm", "price": 1299.0, "url": "https://westelm.com/andes"},
+                {"name": "Nera Bed", "vendor": "Article", "price": 1099.0, "url": "https://article.com/nera"}
+            ],
+            "dining_table": [
+                {"name": "Seno Dining Table", "vendor": "Article", "price": 999.0, "url": "https://article.com/seno"},
+                {"name": "Mid-Century Dining Table", "vendor": "West Elm", "price": 799.0, "url": "https://westelm.com/mid-century-dining"}
+            ],
+            "chair": [
+                {"name": "Svelti Chair", "vendor": "Article", "price": 69.0, "url": "https://article.com/svelti"},
+                {"name": "Classic Café Chair", "vendor": "West Elm", "price": 199.0, "url": "https://westelm.com/cafe-chair"}
             ]
         }
 
@@ -101,6 +113,11 @@ class SourcingAgent:
                     data = list(data.values())[0]
                     if isinstance(data, list):
                         data = {"items": data}
+                # Handle common aliases for 'items'
+                for alias in ["selections", "products", "furniture", "matched_items"]:
+                    if alias in data and "items" not in data:
+                        data["items"] = data.pop(alias)
+                
                 if "items" in data and isinstance(data["items"], list):
                     for item in data["items"]:
                         if not isinstance(item, dict): continue

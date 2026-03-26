@@ -85,7 +85,8 @@ class VisionAgent:
         if not self.use_custom:
             # Uses centralized LLM factory — supports Groq + Gemini
             self.llm = get_llm(agent_name="vision", model=model_name, temperature=0.1)
-            print(f"🧠 Vision Agent using LLM Provider: {os.environ.get('GROQ_API_KEY')[:10] if os.environ.get('GROQ_API_KEY') else 'Gemini/None'}")
+            provider = "Gemini" if os.getenv("GOOGLE_API_KEY") else "Groq" if os.getenv("GROQ_API_KEY") else "None"
+            print(f"🧠 Vision Agent using LLM Provider: {provider}")
 
     async def refine_structure(self, project: BIMProjectState, user_message: str) -> VisionExtraction:
         """Refines the existing structure based on user text commands."""

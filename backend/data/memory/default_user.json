@@ -42,6 +42,18 @@
       "preference": "Minimalist Oak Wood",
       "impact": "positive",
       "confidence": 0.8
+    },
+    {
+      "category": "room_function",
+      "preference": "Master Bedroom used as Office",
+      "impact": "neutral",
+      "confidence": 0.9
+    },
+    {
+      "category": "budget",
+      "preference": "$8000.00 total budget",
+      "impact": "neutral",
+      "confidence": 1.0
     }
   ],
   "history": [
@@ -578,6 +590,24 @@
       "event": "Max Persistence Triggered",
       "decision": "proceeded",
       "reasoning": "Failed compliance check"
+    },
+    {
+      "timestamp": "now",
+      "event": "Zone Identification",
+      "decision": "identified",
+      "reasoning": "Architect identified 8 distinct zones: 3 Master Bedrooms (one labeled Office), 2 Bathrooms, Living Room, Dining, Kitchen, and Balcony."
+    },
+    {
+      "timestamp": "now",
+      "event": "ADA Compliance Review",
+      "decision": "failed but overridden",
+      "reasoning": "Doors door-8e570d and door-82a30b (0.80m) were below the ADA minimum width (0.81m); system proceeded after reaching maximum persistence."
+    },
+    {
+      "timestamp": "now",
+      "event": "Product Sourcing",
+      "decision": "completed",
+      "reasoning": "Sourcing agent identified 16 products within the $8000.00 budget."
     }
   ],
   "style_dna": {}
