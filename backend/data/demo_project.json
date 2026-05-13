@@ -1,0 +1,454 @@
+{
+  "project_id": "demo-japandi-penthouse",
+  "name": "Japandi Penthouse — Demo",
+  "version": 1,
+  "budget_total": 15083.0,
+  "semantic_context": "A 10m x 8m luxury apartment in Japandi Modern style. Open-plan living/dining, master bedroom with study niche, chef kitchen, and wet room bathroom.",
+  "style_profile": {
+    "theme": "Japandi Modern",
+    "wall_color": "#F5F5F0",
+    "floor_material": "White Oak Herringbone",
+    "lighting_mood": "Warm Biophilic",
+    "palette": {
+      "wall_color": "#F5F5F0",
+      "floor_material": "White Oak Herringbone",
+      "lighting_mood": "Warm Biophilic"
+    }
+  },
+  "active_selection": [],
+  "constraints": [],
+  "history": [],
+  "rooms": [
+    {
+      "id": "room-living01",
+      "name": "Living / Dining",
+      "polygon": [[0.2, 0.2], [5.4, 0.2], [5.4, 4.9], [0.2, 4.9]],
+      "elements": []
+    },
+    {
+      "id": "room-bed01",
+      "name": "Master Bedroom",
+      "polygon": [[5.6, 0.2], [9.9, 0.2], [9.9, 4.9], [5.6, 4.9]],
+      "elements": []
+    },
+    {
+      "id": "room-kit01",
+      "name": "Kitchen",
+      "polygon": [[0.2, 5.1], [6.9, 5.1], [6.9, 7.9], [0.2, 7.9]],
+      "elements": []
+    },
+    {
+      "id": "room-bath01",
+      "name": "Bathroom",
+      "polygon": [[7.1, 5.1], [9.9, 5.1], [9.9, 7.9], [7.1, 7.9]],
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "id": "wall-south01",
+      "type": "wall",
+      "position": {"x": 5.0, "y": 1.4, "z": 0.0},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 10.2, "y": 2.8, "z": 0.2},
+      "model_url": null,
+      "material_properties": {},
+      "metadata": {"load_bearing": true}
+    },
+    {
+      "id": "wall-north01",
+      "type": "wall",
+      "position": {"x": 5.0, "y": 1.4, "z": 8.0},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 10.2, "y": 2.8, "z": 0.2},
+      "model_url": null,
+      "material_properties": {},
+      "metadata": {"load_bearing": true}
+    },
+    {
+      "id": "wall-west01",
+      "type": "wall",
+      "position": {"x": 0.0, "y": 1.4, "z": 4.0},
+      "rotation": {"x": 0, "y": 1.5708, "z": 0},
+      "dimensions": {"x": 0.2, "y": 2.8, "z": 8.4},
+      "model_url": null,
+      "material_properties": {},
+      "metadata": {"load_bearing": true}
+    },
+    {
+      "id": "wall-east01",
+      "type": "wall",
+      "position": {"x": 10.0, "y": 1.4, "z": 4.0},
+      "rotation": {"x": 0, "y": 1.5708, "z": 0},
+      "dimensions": {"x": 0.2, "y": 2.8, "z": 8.4},
+      "model_url": null,
+      "material_properties": {},
+      "metadata": {"load_bearing": true}
+    },
+    {
+      "id": "wall-div-lr",
+      "type": "wall",
+      "position": {"x": 5.5, "y": 1.4, "z": 2.5},
+      "rotation": {"x": 0, "y": 1.5708, "z": 0},
+      "dimensions": {"x": 0.1, "y": 2.8, "z": 5.0},
+      "model_url": null,
+      "material_properties": {},
+      "metadata": {"load_bearing": false}
+    },
+    {
+      "id": "wall-div-fb",
+      "type": "wall",
+      "position": {"x": 5.0, "y": 1.4, "z": 5.0},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 10.0, "y": 2.8, "z": 0.1},
+      "model_url": null,
+      "material_properties": {},
+      "metadata": {"load_bearing": false}
+    },
+    {
+      "id": "wall-div-kb",
+      "type": "wall",
+      "position": {"x": 7.0, "y": 1.4, "z": 6.5},
+      "rotation": {"x": 0, "y": 1.5708, "z": 0},
+      "dimensions": {"x": 0.1, "y": 2.8, "z": 3.0},
+      "model_url": null,
+      "material_properties": {},
+      "metadata": {"load_bearing": false}
+    },
+    {
+      "id": "door-entry01",
+      "type": "door",
+      "position": {"x": 2.0, "y": 1.05, "z": 0.1},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 0.9, "y": 2.1, "z": 0.1},
+      "model_url": null,
+      "material_properties": {},
+      "metadata": {"opening_type": "exterior_door"}
+    },
+    {
+      "id": "door-bed01",
+      "type": "door",
+      "position": {"x": 5.5, "y": 1.05, "z": 1.2},
+      "rotation": {"x": 0, "y": 1.5708, "z": 0},
+      "dimensions": {"x": 0.9, "y": 2.1, "z": 0.1},
+      "model_url": null,
+      "material_properties": {},
+      "metadata": {"opening_type": "interior_door"}
+    },
+    {
+      "id": "door-bath01",
+      "type": "door",
+      "position": {"x": 8.5, "y": 1.05, "z": 5.0},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 0.8, "y": 2.1, "z": 0.1},
+      "model_url": null,
+      "material_properties": {},
+      "metadata": {"opening_type": "interior_door"}
+    },
+    {
+      "id": "door-kit01",
+      "type": "door",
+      "position": {"x": 2.5, "y": 1.05, "z": 5.0},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 0.9, "y": 2.1, "z": 0.1},
+      "model_url": null,
+      "material_properties": {},
+      "metadata": {"opening_type": "interior_door"}
+    },
+    {
+      "id": "win-living01",
+      "type": "window",
+      "position": {"x": 4.2, "y": 1.5, "z": 0.1},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 1.4, "y": 1.2, "z": 0.1},
+      "model_url": null,
+      "material_properties": {},
+      "metadata": {"opening_type": "picture_window"}
+    },
+    {
+      "id": "win-bed01",
+      "type": "window",
+      "position": {"x": 7.8, "y": 1.5, "z": 0.1},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 1.2, "y": 1.2, "z": 0.1},
+      "model_url": null,
+      "material_properties": {},
+      "metadata": {"opening_type": "casement_window"}
+    },
+    {
+      "id": "win-kit01",
+      "type": "window",
+      "position": {"x": 3.5, "y": 1.5, "z": 7.9},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 1.4, "y": 1.2, "z": 0.1},
+      "model_url": null,
+      "material_properties": {},
+      "metadata": {"opening_type": "picture_window"}
+    },
+    {
+      "id": "win-bath01",
+      "type": "window",
+      "position": {"x": 8.5, "y": 1.5, "z": 7.9},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 0.8, "y": 1.0, "z": 0.1},
+      "model_url": null,
+      "material_properties": {},
+      "metadata": {"opening_type": "casement_window"}
+    },
+    {
+      "id": "furniture-sofa01",
+      "type": "furniture",
+      "position": {"x": 1.8, "y": 0.425, "z": 3.8},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 2.5, "y": 0.85, "z": 1.0},
+      "model_url": "https://assets.vestacode.ai/models/sectional_sofa_japandi.glb",
+      "material_properties": {"finish": "Oatmeal Boucle", "texture": "fabric", "color": "#C4A882"},
+      "metadata": {
+        "item_type": "L-Shape Sectional Sofa",
+        "reasoning": "Anchored to north wall of living room, leaves clear circulation path to kitchen.",
+        "cost": 1499.0,
+        "sourced_product": {"product_name": "Emery Reversible Sectional", "vendor": "West Elm", "price": 1499.0, "product_url": "https://westelm.com/emery", "stock_status": "In Stock", "match_score": 0.95}
+      }
+    },
+    {
+      "id": "furniture-coffee01",
+      "type": "furniture",
+      "position": {"x": 2.5, "y": 0.225, "z": 2.8},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 1.1, "y": 0.45, "z": 0.6},
+      "model_url": "https://assets.vestacode.ai/models/noguchi_table.glb",
+      "material_properties": {"finish": "Walnut", "texture": "matte", "color": "#6B4C2A"},
+      "metadata": {
+        "item_type": "Noguchi Coffee Table",
+        "reasoning": "Centred in front of sofa with 0.5m clearance on all sides.",
+        "cost": 895.0,
+        "sourced_product": {"product_name": "Noguchi Table", "vendor": "Herman Miller", "price": 895.0, "product_url": "https://hermanmiller.com/noguchi", "stock_status": "In Stock", "match_score": 0.98}
+      }
+    },
+    {
+      "id": "furniture-tv01",
+      "type": "furniture",
+      "position": {"x": 4.2, "y": 0.3, "z": 1.0},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 1.8, "y": 0.6, "z": 0.4},
+      "model_url": "https://assets.vestacode.ai/models/media_console_oak.glb",
+      "material_properties": {"finish": "Smoked Oak", "texture": "matte", "color": "#7D6147"},
+      "metadata": {
+        "item_type": "Media Console",
+        "reasoning": "Against south wall facing sofa, centred on window axis.",
+        "cost": 649.0,
+        "sourced_product": {"product_name": "Mid-Century Media Console", "vendor": "West Elm", "price": 649.0, "product_url": "https://westelm.com/media-console", "stock_status": "In Stock", "match_score": 0.88}
+      }
+    },
+    {
+      "id": "furniture-chair01",
+      "type": "furniture",
+      "position": {"x": 4.2, "y": 0.425, "z": 3.6},
+      "rotation": {"x": 0, "y": 2.356, "z": 0},
+      "dimensions": {"x": 0.85, "y": 0.85, "z": 0.85},
+      "model_url": "https://assets.vestacode.ai/models/eames_lounge.glb",
+      "material_properties": {"finish": "Walnut + Caramel Leather", "texture": "leather", "color": "#A0785A"},
+      "metadata": {
+        "item_type": "Eames Lounge Chair",
+        "reasoning": "Accent reading corner beside east wall of living room.",
+        "cost": 1200.0,
+        "sourced_product": {"product_name": "Eames Lounge Chair & Ottoman", "vendor": "Herman Miller", "price": 1200.0, "product_url": "https://hermanmiller.com/eames-lounge", "stock_status": "In Stock", "match_score": 0.97}
+      }
+    },
+    {
+      "id": "furniture-lamp01",
+      "type": "furniture",
+      "position": {"x": 4.8, "y": 0.9, "z": 4.1},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 0.3, "y": 1.8, "z": 0.3},
+      "model_url": "https://assets.vestacode.ai/models/arc_floor_lamp.glb",
+      "material_properties": {"finish": "Matte Black Steel", "texture": "metal", "color": "#1A1A1A"},
+      "metadata": {
+        "item_type": "Arc Floor Lamp",
+        "reasoning": "Task lighting for reading corner, arcing over lounge chair.",
+        "cost": 299.0,
+        "sourced_product": {"product_name": "Arc Floor Lamp", "vendor": "West Elm", "price": 299.0, "product_url": "https://westelm.com/arc-lamp", "stock_status": "In Stock", "match_score": 0.9}
+      }
+    },
+    {
+      "id": "furniture-dtable01",
+      "type": "furniture",
+      "position": {"x": 1.5, "y": 0.375, "z": 1.5},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 1.6, "y": 0.75, "z": 0.9},
+      "model_url": "https://assets.vestacode.ai/models/dining_table_oak.glb",
+      "material_properties": {"finish": "White Oak", "texture": "matte", "color": "#C8AD8F"},
+      "metadata": {
+        "item_type": "Seno Dining Table",
+        "reasoning": "Dining zone in west section of living room, near kitchen access door.",
+        "cost": 999.0,
+        "sourced_product": {"product_name": "Seno Dining Table", "vendor": "Article", "price": 999.0, "product_url": "https://article.com/seno", "stock_status": "In Stock", "match_score": 0.94}
+      }
+    },
+    {
+      "id": "furniture-dchair01",
+      "type": "furniture",
+      "position": {"x": 0.8, "y": 0.45, "z": 1.2},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 0.5, "y": 0.9, "z": 0.5},
+      "model_url": "https://assets.vestacode.ai/models/dining_chair.glb",
+      "material_properties": {"finish": "Natural Oak + Linen", "texture": "fabric", "color": "#D4C5B2"},
+      "metadata": {"item_type": "Dining Chair", "reasoning": "Dining set seating.", "cost": 199.0}
+    },
+    {
+      "id": "furniture-dchair02",
+      "type": "furniture",
+      "position": {"x": 2.2, "y": 0.45, "z": 1.2},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 0.5, "y": 0.9, "z": 0.5},
+      "model_url": "https://assets.vestacode.ai/models/dining_chair.glb",
+      "material_properties": {"finish": "Natural Oak + Linen", "texture": "fabric", "color": "#D4C5B2"},
+      "metadata": {"item_type": "Dining Chair", "reasoning": "Dining set seating.", "cost": 199.0}
+    },
+    {
+      "id": "furniture-dchair03",
+      "type": "furniture",
+      "position": {"x": 0.8, "y": 0.45, "z": 1.8},
+      "rotation": {"x": 0, "y": 3.1416, "z": 0},
+      "dimensions": {"x": 0.5, "y": 0.9, "z": 0.5},
+      "model_url": "https://assets.vestacode.ai/models/dining_chair.glb",
+      "material_properties": {"finish": "Natural Oak + Linen", "texture": "fabric", "color": "#D4C5B2"},
+      "metadata": {"item_type": "Dining Chair", "reasoning": "Dining set seating.", "cost": 199.0}
+    },
+    {
+      "id": "furniture-dchair04",
+      "type": "furniture",
+      "position": {"x": 2.2, "y": 0.45, "z": 1.8},
+      "rotation": {"x": 0, "y": 3.1416, "z": 0},
+      "dimensions": {"x": 0.5, "y": 0.9, "z": 0.5},
+      "model_url": "https://assets.vestacode.ai/models/dining_chair.glb",
+      "material_properties": {"finish": "Natural Oak + Linen", "texture": "fabric", "color": "#D4C5B2"},
+      "metadata": {"item_type": "Dining Chair", "reasoning": "Dining set seating.", "cost": 199.0}
+    },
+    {
+      "id": "furniture-bed01",
+      "type": "furniture",
+      "position": {"x": 7.5, "y": 0.3, "z": 2.8},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 1.8, "y": 0.6, "z": 2.1},
+      "model_url": "https://assets.vestacode.ai/models/king_bed_japandi.glb",
+      "material_properties": {"finish": "Walnut Frame + Linen", "texture": "fabric", "color": "#E8DDD4"},
+      "metadata": {
+        "item_type": "Andes King Bed",
+        "reasoning": "Centred on east wall of bedroom, 0.8m clearance on both sides.",
+        "cost": 1299.0,
+        "sourced_product": {"product_name": "Andes Bed", "vendor": "West Elm", "price": 1299.0, "product_url": "https://westelm.com/andes", "stock_status": "In Stock", "match_score": 0.96}
+      }
+    },
+    {
+      "id": "furniture-ns01",
+      "type": "furniture",
+      "position": {"x": 6.5, "y": 0.35, "z": 2.8},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 0.5, "y": 0.7, "z": 0.45},
+      "model_url": "https://assets.vestacode.ai/models/nightstand.glb",
+      "material_properties": {"finish": "Walnut", "texture": "matte", "color": "#7D6147"},
+      "metadata": {"item_type": "Nightstand", "reasoning": "Left nightstand with clearance to bedroom door.", "cost": 249.0}
+    },
+    {
+      "id": "furniture-ns02",
+      "type": "furniture",
+      "position": {"x": 8.5, "y": 0.35, "z": 2.8},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 0.5, "y": 0.7, "z": 0.45},
+      "model_url": "https://assets.vestacode.ai/models/nightstand.glb",
+      "material_properties": {"finish": "Walnut", "texture": "matte", "color": "#7D6147"},
+      "metadata": {"item_type": "Nightstand", "reasoning": "Right nightstand, symmetric placement.", "cost": 249.0}
+    },
+    {
+      "id": "furniture-wardrobe01",
+      "type": "furniture",
+      "position": {"x": 7.5, "y": 1.1, "z": 0.4},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 2.4, "y": 2.2, "z": 0.65},
+      "model_url": "https://assets.vestacode.ai/models/builtin_wardrobe.glb",
+      "material_properties": {"finish": "Floor-to-Ceiling Oak Veneer", "texture": "matte", "color": "#C8AD8F"},
+      "metadata": {
+        "item_type": "Built-in Wardrobe",
+        "reasoning": "Floor-to-ceiling integrated wardrobe on south wall of bedroom. Includes study niche on right side aligned with window.",
+        "cost": 2200.0
+      }
+    },
+    {
+      "id": "furniture-desk01",
+      "type": "furniture",
+      "position": {"x": 9.3, "y": 0.375, "z": 2.0},
+      "rotation": {"x": 0, "y": 1.5708, "z": 0},
+      "dimensions": {"x": 1.2, "y": 0.75, "z": 0.6},
+      "model_url": "https://assets.vestacode.ai/models/study_desk.glb",
+      "material_properties": {"finish": "Smoked Oak", "texture": "matte", "color": "#7D6147"},
+      "metadata": {"item_type": "Study Desk", "reasoning": "Study niche against east wall, natural light from bedroom window.", "cost": 549.0}
+    },
+    {
+      "id": "furniture-island01",
+      "type": "furniture",
+      "position": {"x": 3.2, "y": 0.45, "z": 6.5},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 1.6, "y": 0.9, "z": 0.9},
+      "model_url": "https://assets.vestacode.ai/models/kitchen_island.glb",
+      "material_properties": {"finish": "Quartz Countertop + Oak Base", "texture": "smooth", "color": "#E8E4DF"},
+      "metadata": {
+        "item_type": "Kitchen Island",
+        "reasoning": "Central island with breakfast bar. 1.0m clearance on all sides for workflow triangle.",
+        "cost": 1800.0
+      }
+    },
+    {
+      "id": "furniture-cabinets01",
+      "type": "furniture",
+      "position": {"x": 1.0, "y": 0.45, "z": 7.6},
+      "rotation": {"x": 0, "y": 0, "z": 0},
+      "dimensions": {"x": 1.8, "y": 0.9, "z": 0.6},
+      "model_url": "https://assets.vestacode.ai/models/kitchen_cabinets.glb",
+      "material_properties": {"finish": "Handleless Matte White + Oak", "texture": "matte", "color": "#F5F5F0"},
+      "metadata": {
+        "item_type": "Kitchen Cabinets",
+        "reasoning": "Run of base and wall cabinets along north kitchen wall.",
+        "cost": 2400.0
+      }
+    }
+  ],
+  "compliance_logs": [
+    {
+      "timestamp": "2026-04-07T09:00:00Z",
+      "agent": "spatial_engine",
+      "flow_score": 84,
+      "collision_count": 0,
+      "clearance_violations": 1,
+      "blocked_paths": 0,
+      "density_ratio": 0.27,
+      "corrections_applied": 2,
+      "issues": [
+        {
+          "severity": "warning",
+          "type": "clearance",
+          "elements": ["furniture-dchair01", "door-kit01"],
+          "description": "Dining chair encroaches 0.12m² on kitchen door swing arc. Min clearance: 1.2m.",
+          "auto_fixed": false,
+          "fix": "Rotate dining chair or shift dining table 0.15m east."
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-07T09:00:05Z",
+      "agent": "compliance",
+      "is_compliant": true,
+      "summary": "Compliant with 1 advisory warning. All ADA door widths, egress paths, and room areas meet code.",
+      "violation_count": 1,
+      "violations": [
+        {
+          "element_id": "furniture-dchair01",
+          "rule_id": "ADA-404.2.4",
+          "severity": "warning",
+          "description": "Dining Chair 01 is within 0.78m of Kitchen Door (min: 0.91m). Advisory only for residential use.",
+          "remediation_advice": "Shift dining table 0.15m east to increase door clearance."
+        }
+      ]
+    }
+  ]
+}
