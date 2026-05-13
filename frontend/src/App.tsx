@@ -8,10 +8,11 @@ import {
     Maximize, RotateCcw, Layers, Zap, MessageSquare,
     CheckCircle2, AlertTriangle, Command, GitCompare,
     Sparkles, X, Check, ArrowRight, FileCode2,
-    Wrench, SearchCode, Image, Gauge, Download, FileDown
+    Wrench, SearchCode, Image, Gauge, Download, FileDown,
+    ExternalLink, FileText, PenTool
 } from 'lucide-react';
 import { useBIMStore } from './hooks/useBIMStore';
-import { BIMElement, BIMProjectState, CONTEXT_REFS, LintIssue, DiffEntry } from './services/api';
+import { BIMElement, BIMProjectState, CONTEXT_REFS, LintIssue, DiffEntry, ApiService } from './services/api';
 
 /* ========== 3D Renderers (Photorealistic PBR) ========== */
 function BIMElementRenderer({ element, ghostStatus, realisticMode }: { element: BIMElement; ghostStatus?: 'added' | 'removed' | 'modified' | null; realisticMode?: boolean }) {
@@ -454,12 +455,151 @@ function ClientReviewModal({ project, onClose }: { project: BIMProjectState; onC
     );
 }
 
+/* ========== Style Quiz Onboarding Modal ========== */
+const STYLE_PALETTES = [
+    { name: 'Japandi Modern', colors: ['#F5F5F0', '#2d2d2d', '#C4A882', '#7D6147'], icon: '🎋' },
+    { name: 'Scandinavian', colors: ['#FFFFFF', '#E8E4DF', '#B8C5D6', '#4A6741'], icon: '❄️' },
+    { name: 'Industrial Loft', colors: ['#2C2C2C', '#8B8B8B', '#C7956D', '#4A4A4A'], icon: '🏗️' },
+    { name: 'Mid-Century Modern', colors: ['#F4EBD9', '#D4763C', '#2E5E4E', '#1A1A1A'], icon: '🛋️' },
+    { name: 'Coastal Mediterranean', colors: ['#F0F4F8', '#2C5F7C', '#E8D5B7', '#FFFFFF'], icon: '🌊' },
+    { name: 'Bohemian Eclectic', colors: ['#F5E6D3', '#8B4513', '#C4A35A', '#6B3A2E'], icon: '🌿' },
+];
+
+const MATERIAL_PREFS = [
+    { id: 'natural', label: 'Natural Wood & Stone', icon: '🪵' },
+    { id: 'modern', label: 'Metal & Glass', icon: '🔩' },
+    { id: 'soft', label: 'Textiles & Fabric', icon: '🧶' },
+    { id: 'mixed', label: 'Mixed Materials', icon: '✨' },
+];
+
+const BUDGET_RANGES = [
+    { id: 'budget', label: 'Under $5,000', range: [0, 5000] },
+    { id: 'mid', label: '$5,000 – $15,000', range: [5000, 15000] },
+    { id: 'premium', label: '$15,000 – $40,000', range: [15000, 40000] },
+    { id: 'luxury', label: '$40,000+', range: [40000, 100000] },
+];
+
+function StyleQuizModal({ onClose, onComplete }: { onClose: () => void; onComplete: (profile: any) => void }) {
+    const [step, setStep] = useState(0);
+    const [selectedPalette, setSelectedPalette] = useState('');
+    const [selectedMaterial, setSelectedMaterial] = useState('');
+    const [selectedBudget, setSelectedBudget] = useState('');
+
+    const handleFinish = () => {
+        const palette = STYLE_PALETTES.find(p => p.name === selectedPalette);
+        const budget = BUDGET_RANGES.find(b => b.id === selectedBudget);
+        onComplete({
+            theme: selectedPalette || 'Japandi Modern',
+            material_preference: selectedMaterial || 'mixed',
+            budget_range: budget?.range || [5000, 15000],
+            wall_color: palette?.colors[0] || '#F5F5F0',
+            palette: {
+                wall_color: palette?.colors[0] || '#F5F5F0',
+                accent_color: palette?.colors[2] || '#C4A882',
+            },
+            lighting_mood: selectedPalette.includes('Modern') ? 'Warm Biophilic' : 'Natural Daylight',
+        });
+        onClose();
+    };
+
+    return (
+        <div className="cmdk-overlay" onClick={onClose}>
+            <div className="style-quiz-modal" onClick={e => e.stopPropagation()}>
+                <button className="review-close" onClick={onClose}><X size={18} /></button>
+
+                <div className="quiz-progress">
+                    {[0, 1, 2].map(i => (
+                        <div key={i} className={`quiz-progress-dot ${step >= i ? 'active' : ''}`} />
+                    ))}
+                </div>
+
+                {step === 0 && (
+                    <div className="quiz-step">
+                        <h2>What's your style?</h2>
+                        <p className="quiz-subtitle">Choose the aesthetic that resonates with you</p>
+                        <div className="quiz-grid palette-grid">
+                            {STYLE_PALETTES.map(p => (
+                                <button
+                                    key={p.name}
+                                    className={`quiz-option palette-option ${selectedPalette === p.name ? 'selected' : ''}`}
+                                    onClick={() => setSelectedPalette(p.name)}
+                                >
+                                    <span className="palette-icon">{p.icon}</span>
+                                    <span className="palette-name">{p.name}</span>
+                                    <div className="palette-swatches">
+                                        {p.colors.map((c, i) => (
+                                            <div key={i} className="palette-swatch" style={{ background: c }} />
+                                        ))}
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {step === 1 && (
+                    <div className="quiz-step">
+                        <h2>Material preference?</h2>
+                        <p className="quiz-subtitle">What textures do you gravitate toward?</p>
+                        <div className="quiz-grid material-grid">
+                            {MATERIAL_PREFS.map(m => (
+                                <button
+                                    key={m.id}
+                                    className={`quiz-option material-option ${selectedMaterial === m.id ? 'selected' : ''}`}
+                                    onClick={() => setSelectedMaterial(m.id)}
+                                >
+                                    <span className="material-icon">{m.icon}</span>
+                                    <span>{m.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {step === 2 && (
+                    <div className="quiz-step">
+                        <h2>Room budget?</h2>
+                        <p className="quiz-subtitle">What's your comfortable investment range?</p>
+                        <div className="quiz-grid budget-grid">
+                            {BUDGET_RANGES.map(b => (
+                                <button
+                                    key={b.id}
+                                    className={`quiz-option budget-option ${selectedBudget === b.id ? 'selected' : ''}`}
+                                    onClick={() => setSelectedBudget(b.id)}
+                                >
+                                    {b.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                <div className="quiz-nav">
+                    {step > 0 && (
+                        <button className="quiz-back-btn" onClick={() => setStep(s => s - 1)}>Back</button>
+                    )}
+                    <div style={{ flex: 1 }} />
+                    {step < 2 ? (
+                        <button className="quiz-next-btn" onClick={() => setStep(s => s + 1)}>
+                            Next <ArrowRight size={14} />
+                        </button>
+                    ) : (
+                        <button className="quiz-next-btn finish" onClick={handleFinish}>
+                            <Sparkles size={14} /> Start Designing
+                        </button>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
+
 /* ========== Main App ========== */
 function App() {
     const {
-        project, previousProject, isProcessing, logs,
+        project, previousProject, isProcessing, pipelineStep, logs,
         lintIssues, diffEntries, ghostMode,
-        uploadPlan, sendMessage,
+        uploadPlan, loadDemo, sendMessage,
         acceptAllDiffs, toggleGhostMode
     } = useBIMStore();
 
@@ -475,6 +615,8 @@ function App() {
     // Client review & realistic mode
     const [showReview, setShowReview] = useState(false);
     const [realisticMode, setRealisticMode] = useState(false);
+    // Style quiz
+    const [showStyleQuiz, setShowStyleQuiz] = useState(false);
 
     // Auto-scroll chat
     useEffect(() => {
@@ -560,6 +702,17 @@ function App() {
                 />
             )}
 
+            {/* ===== STYLE QUIZ MODAL ===== */}
+            {showStyleQuiz && (
+                <StyleQuizModal
+                    onClose={() => setShowStyleQuiz(false)}
+                    onComplete={(profile) => {
+                        console.log('Style profile set:', profile);
+                        (window as any).__vestaStyleProfile = profile;
+                    }}
+                />
+            )}
+
             {/* ===== HEADER ===== */}
             <header>
                 <div className="logo">
@@ -585,6 +738,12 @@ function App() {
                 </div>
 
                 <div className="header-right">
+                    {/* Pipeline step indicator */}
+                    {pipelineStep && (
+                        <div className="pipeline-step-pill">
+                            {pipelineStep}
+                        </div>
+                    )}
                     <div className={`status-pill ${isProcessing ? 'processing' : 'active'}`}>
                         <span className="pulse-dot"></span>
                         {isProcessing ? 'Agents Working' : 'AI Active'}
@@ -607,37 +766,6 @@ function App() {
                     <div className="card-header">
                         <Box size={14} className="card-icon" />
                         <h3>Project Overview</h3>
-                        {/* New Export Button */}
-                        {project && (
-                            <button
-                                className="icon-btn-sm"
-                                title="Export to Revit (IFC)"
-                                onClick={async () => {
-                                    try {
-                                        const res = await fetch('http://localhost:25678/project/export/ifc', {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify(project)
-                                        });
-                                        if (res.ok) {
-                                            const blob = await res.blob();
-                                            const url = window.URL.createObjectURL(blob);
-                                            const a = document.createElement('a');
-                                            a.href = url;
-                                            a.download = `vesta_export_${project!.project_id}.ifc`;
-                                            a.click();
-                                        } else {
-                                            const txt = await res.text();
-                                            alert("Export failed: " + txt);
-                                        }
-                                    } catch (e) {
-                                        alert("Error exporting: " + e);
-                                    }
-                                }}
-                            >
-                                <FileDown size={14} />
-                            </button>
-                        )}
                     </div>
                     {project ? (
                         <>
@@ -665,6 +793,61 @@ function App() {
                         </p>
                     )}
                 </div>
+
+                {/* ===== DELIVERABLES / ACTIONS ===== */}
+                {project && (
+                    <div className="glass-card">
+                        <div className="card-header">
+                            <Download size={14} className="card-icon" />
+                            <h3>Export Deliverables</h3>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                            <button
+                                className="design-my-space-btn"
+                                style={{ flex: 1, padding: '8px 0', fontSize: '0.75rem' }}
+                                onClick={async () => {
+                                    try {
+                                        const blob = await ApiService.exportIfc(project!);
+                                        const url = window.URL.createObjectURL(blob);
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.download = `vesta_export_${project!.project_id}.ifc`;
+                                        a.click();
+                                    } catch (e) {
+                                        alert("Export failed: " + e);
+                                    }
+                                }}
+                            >
+                                <FileDown size={14} /> IFC (.ifc)
+                            </button>
+                            <button
+                                className="design-my-space-btn"
+                                style={{ flex: 1, padding: '8px 0', fontSize: '0.75rem' }}
+                                onClick={async () => {
+                                    try {
+                                        const blob = await ApiService.exportDxf(project!);
+                                        const url = window.URL.createObjectURL(blob);
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.download = `vesta_export_${project!.project_id}.dxf`;
+                                        a.click();
+                                    } catch (e) {
+                                        alert("DXF Export failed: " + e);
+                                    }
+                                }}
+                            >
+                                <PenTool size={14} /> DXF (.dxf)
+                            </button>
+                        </div>
+                        <button
+                            className="design-my-space-btn"
+                            style={{ width: '100%', marginTop: '8px' }}
+                            onClick={() => window.open(`/api/project/${project!.project_id}/report`, '_blank')}
+                        >
+                            <FileText size={14} /> Generate PDF Layout Report
+                        </button>
+                    </div>
+                )}
 
                 {/* Memory Pulse */}
                 <div className="glass-card">
@@ -756,6 +939,26 @@ function App() {
                         : <><Upload size={18} /> Upload Floor Plan</>
                     }
                 </button>
+                {/* Style Quiz Starter & Demo */}
+                {!project && (
+                    <>
+                        <button 
+                            className="upload-btn" 
+                            style={{ background: 'var(--accent-gradient)', marginTop: 6 }} 
+                            onClick={() => setShowStyleQuiz(true)}
+                        >
+                            <Sparkles size={18} /> Update Style Profile
+                        </button>
+                        <button
+                            className="upload-btn"
+                            style={{ background: 'rgba(109,97,255,0.15)', border: '1px solid rgba(109,97,255,0.35)', marginTop: 6 }}
+                            onClick={loadDemo}
+                            disabled={isProcessing}
+                        >
+                            <Box size={18} /> Try Pre-Built Demo
+                        </button>
+                    </>
+                )}
                 {project && elements.length > 0 && (
                     <button className="review-trigger-btn" onClick={() => setShowReview(true)}>
                         <Eye size={16} /> Client Review
@@ -797,6 +1000,17 @@ function App() {
                         <div className="viewport-empty-icon"><Layout size={28} /></div>
                         <h3>Your Canvas Awaits</h3>
                         <p>Upload a 2D floor plan or press <strong>⌘K</strong> to start designing with your AI team.</p>
+                        <button
+                            onClick={loadDemo}
+                            style={{
+                                marginTop: 16, padding: '10px 22px', borderRadius: 8,
+                                background: 'rgba(109,97,255,0.2)', border: '1px solid rgba(109,97,255,0.5)',
+                                color: '#a29dff', cursor: 'pointer', fontSize: '0.85rem',
+                                display: 'flex', alignItems: 'center', gap: 8
+                            }}
+                        >
+                            <Sparkles size={15} /> Try Demo — Japandi Penthouse
+                        </button>
                     </div>
                 )}
 

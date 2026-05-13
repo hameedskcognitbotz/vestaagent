@@ -244,9 +244,18 @@ workflow.add_edge("spatial_validation", "compliance")
 
 # Conditional Edge for Compliance Loop
 def should_continue_compliance(state: AgentState):
-    last_msg = state["messages"][-1]["content"] if state["messages"] else ""
-    if "Rejected" in last_msg and state.get("loop_count", 0) <= 3:
-        return "retry"
+    """Use the typed is_compliant field — never fragile string matching."""
+    project = state["project"]
+    logs = project.compliance_logs if project.compliance_logs else []
+    # Find the last compliance agent log (not spatial_engine)
+    last_compliance = None
+    for log in reversed(logs):
+        if log.get("agent") != "spatial_engine" and "is_compliant" in log:
+            last_compliance = log
+            break
+    if last_compliance and not last_compliance.get("is_compliant", True):
+        if state.get("loop_count", 0) < 3:
+            return "retry"
     return "proceed"
 
 workflow.add_conditional_edges(

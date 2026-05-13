@@ -18,27 +18,64 @@ Output a valid JSON matching the SourcingReport schema.
 class SourcingAgent:
     def __init__(self, model_name: str = None):
         self.llm = get_llm(agent_name="sourcing", model=model_name, temperature=0)
+        # ── Affiliate-ready product catalogue ──────────────────────────
+        # URLs include ?ref=vestacode for affiliate tracking.
+        # Expand per-category as partnerships are signed.
         self.catalogue = {
             "sofa": [
-                {"name": "Emery Reversible Sectional", "vendor": "West Elm", "price": 1499.0, "url": "https://westelm.com/emery"},
-                {"name": "Burrard Sofa", "vendor": "Article", "price": 1199.0, "url": "https://article.com/burrard"}
+                {"name": "Emery Reversible Sectional", "vendor": "West Elm", "price": 1499.0, "url": "https://westelm.com/emery?ref=vestacode"},
+                {"name": "Burrard Sofa", "vendor": "Article", "price": 1199.0, "url": "https://article.com/burrard?ref=vestacode"},
+                {"name": "KIVIK Sofa", "vendor": "IKEA", "price": 699.0, "url": "https://ikea.com/us/en/p/kivik-sofa-s29305507/?ref=vestacode"},
             ],
             "coffee_table": [
-                {"name": "Noguchi Table", "vendor": "Herman Miller", "price": 895.0, "url": "https://hermanmiller.com/noguchi"},
-                {"name": "Mid-Century Table", "vendor": "West Elm", "price": 399.0, "url": "https://westelm.com/mid-century"}
+                {"name": "Noguchi Table", "vendor": "Herman Miller", "price": 895.0, "url": "https://hermanmiller.com/noguchi?ref=vestacode"},
+                {"name": "Mid-Century Table", "vendor": "West Elm", "price": 399.0, "url": "https://westelm.com/mid-century?ref=vestacode"},
+                {"name": "LACK Coffee Table", "vendor": "IKEA", "price": 29.99, "url": "https://ikea.com/us/en/p/lack-coffee-table-s30449908/?ref=vestacode"},
             ],
             "bed": [
-                {"name": "Andes Bed", "vendor": "West Elm", "price": 1299.0, "url": "https://westelm.com/andes"},
-                {"name": "Nera Bed", "vendor": "Article", "price": 1099.0, "url": "https://article.com/nera"}
+                {"name": "Andes Bed", "vendor": "West Elm", "price": 1299.0, "url": "https://westelm.com/andes?ref=vestacode"},
+                {"name": "Nera Bed", "vendor": "Article", "price": 1099.0, "url": "https://article.com/nera?ref=vestacode"},
+                {"name": "MALM Bed Frame", "vendor": "IKEA", "price": 249.0, "url": "https://ikea.com/us/en/p/malm-bed-frame-high-s49027393/?ref=vestacode"},
             ],
             "dining_table": [
-                {"name": "Seno Dining Table", "vendor": "Article", "price": 999.0, "url": "https://article.com/seno"},
-                {"name": "Mid-Century Dining Table", "vendor": "West Elm", "price": 799.0, "url": "https://westelm.com/mid-century-dining"}
+                {"name": "Seno Dining Table", "vendor": "Article", "price": 999.0, "url": "https://article.com/seno?ref=vestacode"},
+                {"name": "Mid-Century Dining Table", "vendor": "West Elm", "price": 799.0, "url": "https://westelm.com/mid-century-dining?ref=vestacode"},
+                {"name": "LISABO Table", "vendor": "IKEA", "price": 179.0, "url": "https://ikea.com/us/en/p/lisabo-table-s99268528/?ref=vestacode"},
             ],
             "chair": [
-                {"name": "Svelti Chair", "vendor": "Article", "price": 69.0, "url": "https://article.com/svelti"},
-                {"name": "Classic Café Chair", "vendor": "West Elm", "price": 199.0, "url": "https://westelm.com/cafe-chair"}
-            ]
+                {"name": "Eames Lounge Chair & Ottoman", "vendor": "Herman Miller", "price": 1200.0, "url": "https://hermanmiller.com/eames-lounge?ref=vestacode"},
+                {"name": "Classic Café Chair", "vendor": "West Elm", "price": 199.0, "url": "https://westelm.com/cafe-chair?ref=vestacode"},
+                {"name": "Svelti Chair", "vendor": "Article", "price": 69.0, "url": "https://article.com/svelti?ref=vestacode"},
+            ],
+            "lamp": [
+                {"name": "Arc Floor Lamp", "vendor": "West Elm", "price": 299.0, "url": "https://westelm.com/arc-lamp?ref=vestacode"},
+                {"name": "HEKTAR Floor Lamp", "vendor": "IKEA", "price": 69.99, "url": "https://ikea.com/us/en/p/hektar-floor-lamp-s30282172/?ref=vestacode"},
+                {"name": "Grasshopper Floor Lamp", "vendor": "Design Within Reach", "price": 1095.0, "url": "https://dwr.com/grasshopper?ref=vestacode"},
+            ],
+            "rug": [
+                {"name": "Jute Boucle Rug", "vendor": "West Elm", "price": 499.0, "url": "https://westelm.com/jute-boucle?ref=vestacode"},
+                {"name": "VINDUM Rug", "vendor": "IKEA", "price": 149.0, "url": "https://ikea.com/us/en/p/vindum-rug-s60462840/?ref=vestacode"},
+            ],
+            "bookshelf": [
+                {"name": "Mid-Century Bookshelf", "vendor": "West Elm", "price": 599.0, "url": "https://westelm.com/bookshelf?ref=vestacode"},
+                {"name": "KALLAX Shelf Unit", "vendor": "IKEA", "price": 89.99, "url": "https://ikea.com/us/en/p/kallax-shelf-unit-s20275885/?ref=vestacode"},
+            ],
+            "nightstand": [
+                {"name": "Mid-Century Nightstand", "vendor": "West Elm", "price": 349.0, "url": "https://westelm.com/nightstand?ref=vestacode"},
+                {"name": "HEMNES Nightstand", "vendor": "IKEA", "price": 99.99, "url": "https://ikea.com/us/en/p/hemnes-nightstand-s80380483/?ref=vestacode"},
+            ],
+            "wardrobe": [
+                {"name": "PAX Wardrobe", "vendor": "IKEA", "price": 430.0, "url": "https://ikea.com/us/en/p/pax-wardrobe-s49302971/?ref=vestacode"},
+                {"name": "Grain Wardrobe", "vendor": "Article", "price": 1299.0, "url": "https://article.com/grain-wardrobe?ref=vestacode"},
+            ],
+            "desk": [
+                {"name": "Mid-Century Desk", "vendor": "West Elm", "price": 549.0, "url": "https://westelm.com/desk?ref=vestacode"},
+                {"name": "BEKANT Desk", "vendor": "IKEA", "price": 299.0, "url": "https://ikea.com/us/en/p/bekant-desk-sit-stand-s49022538/?ref=vestacode"},
+            ],
+            "kitchen_island": [
+                {"name": "Portobello Kitchen Island", "vendor": "Crate & Barrel", "price": 1799.0, "url": "https://crateandbarrel.com/portobello?ref=vestacode"},
+                {"name": "VADHOLMA Kitchen Island", "vendor": "IKEA", "price": 399.0, "url": "https://ikea.com/us/en/p/vadholma-kitchen-island-s69276805/?ref=vestacode"},
+            ],
         }
 
     async def search_products(self, project: BIMProjectState, knowledge: Optional[Dict[str, Any]] = None) -> SourcingReport:

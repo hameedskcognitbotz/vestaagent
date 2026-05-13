@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { ApiService, BIMProjectState, BIMElement, LintIssue, DiffEntry } from '../services/api';
 
 export interface LogEntry {
@@ -7,15 +7,39 @@ export interface LogEntry {
     timestamp: number;
 }
 
+const STEP_LABELS: Record<string, string> = {
+    queued: '⏳ Queued…',
+    vision: '🔍 Analyzing floor plan…',
+    stylist: '🛋️ Designing interior…',
+    spatial_validation: '📐 Validating geometry…',
+    compliance: '🛡️ Checking regulations…',
+    sourcing: '🛒 Finding products…',
+    memory_refinery: '🧠 Learning preferences…',
+    done: '✅ Complete',
+    failed: '❌ Failed',
+};
+
 export function useBIMStore() {
     const [project, setProject] = useState<BIMProjectState | null>(null);
     const [previousProject, setPreviousProject] = useState<BIMProjectState | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [pipelineStep, setPipelineStep] = useState<string>('');
     const [logs, setLogs] = useState<LogEntry[]>([]);
     const [lintIssues, setLintIssues] = useState<LintIssue[]>([]);
     const [diffEntries, setDiffEntries] = useState<DiffEntry[]>([]);
     const [ghostMode, setGhostMode] = useState(false);
     const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
+    const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // Auto-save: debounce 3s after any project change (skip demo project)
+    useEffect(() => {
+        if (!project || project.project_id === 'demo-japandi-penthouse') return;
+        if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = setTimeout(() => {
+            ApiService.saveProject(project).catch(() => {/* silent — non-blocking */});
+        }, 3000);
+        return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current); };
+    }, [project]);
 
     const addLog = useCallback((agent: string, message: string) => {
         setLogs(prev => [...prev, { agent, message, timestamp: Date.now() }]);
@@ -42,7 +66,6 @@ export function useBIMStore() {
         // Add common spatial checks client-side
         state.elements.forEach(el => {
             if (el.type === 'furniture') {
-                // Check for overlapping furniture
                 state.elements.forEach(other => {
                     if (other.id !== el.id && other.type === 'furniture') {
                         const dx = Math.abs(el.position.x - other.position.x);
@@ -81,21 +104,18 @@ export function useBIMStore() {
         const oldIds = new Set(oldState.elements.map(e => e.id));
         const newIds = new Set(newState.elements.map(e => e.id));
 
-        // Added elements
         newState.elements.forEach(el => {
             if (!oldIds.has(el.id)) {
                 entries.push({ element_id: el.id, status: 'added', new_element: el });
             }
         });
 
-        // Removed elements
         oldState.elements.forEach(el => {
             if (!newIds.has(el.id)) {
                 entries.push({ element_id: el.id, status: 'removed', old_element: el });
             }
         });
 
-        // Modified elements
         newState.elements.forEach(nel => {
             const oel = oldState.elements.find(e => e.id === nel.id);
             if (oel) {
@@ -110,22 +130,51 @@ export function useBIMStore() {
         setDiffEntries(entries);
     }, []);
 
+    // ---- Async upload with job polling ----
     const uploadPlan = async (file: File) => {
         setIsProcessing(true);
-        addLog('System', '🚀 Uploading floor plan to Vision Agent...');
+        setPipelineStep('queued');
+        addLog('System', '🚀 Uploading floor plan — starting AI pipeline…');
 
         try {
-            const result = await ApiService.uploadPlan(file);
-            setPreviousProject(project);
-            setProject(result.bim_state);
-            computeLintIssues(result.bim_state);
-            computeDiff(project, result.bim_state);
-            addLog('Architect', result.vision_notes || 'Wall geometry extracted. BIM state initialized.');
+            const { job_id } = await ApiService.uploadPlan(file);
+            addLog('System', `Job ${job_id.slice(0, 8)}… created. Polling for status…`);
+
+            // Poll every 2s
+            const poll = async (): Promise<void> => {
+                const job = await ApiService.pollJob(job_id);
+                const label = STEP_LABELS[job.current_step] || job.current_step;
+                setPipelineStep(label);
+
+                if (job.status === 'completed' && job.result) {
+                    setPreviousProject(project);
+                    setProject(job.result.bim_state);
+                    computeLintIssues(job.result.bim_state);
+                    computeDiff(project, job.result.bim_state);
+                    addLog('Architect', job.result.vision_notes || 'Wall geometry extracted. BIM state initialized.');
+                    setIsProcessing(false);
+                    setPipelineStep('');
+                    return;
+                }
+
+                if (job.status === 'failed') {
+                    addLog('System', `❌ Pipeline failed: ${job.error || 'Unknown error'}`);
+                    setIsProcessing(false);
+                    setPipelineStep('');
+                    return;
+                }
+
+                // Still running — poll again
+                await new Promise(r => setTimeout(r, 8000));
+                return poll();
+            };
+
+            await poll();
         } catch (error) {
             console.error('Failed to upload plan:', error);
             addLog('System', '❌ Error: Failed to process floor plan.');
-        } finally {
             setIsProcessing(false);
+            setPipelineStep('');
         }
     };
 
@@ -157,6 +206,23 @@ export function useBIMStore() {
         }
     };
 
+    const loadDemo = async () => {
+        setIsProcessing(true);
+        addLog('System', '🏠 Loading Japandi Penthouse demo…');
+        try {
+            const result = await ApiService.loadDemo();
+            setProject(result.bim_state);
+            setPreviousProject(null);
+            computeLintIssues(result.bim_state);
+            computeDiff(null, result.bim_state);
+            addLog('Architect', result.vision_notes);
+        } catch (error) {
+            addLog('System', '❌ Could not load demo. Is the backend running?');
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
     // Accept a single diff change
     const acceptDiffEntry = useCallback((entryId: string) => {
         setDiffEntries(prev => prev.filter(e => e.element_id !== entryId));
@@ -169,13 +235,10 @@ export function useBIMStore() {
         if (!entry) return;
 
         if (entry.status === 'added') {
-            // Remove the added element
             setProject(prev => prev ? { ...prev, elements: prev.elements.filter(e => e.id !== entryId) } : prev);
         } else if (entry.status === 'removed' && entry.old_element) {
-            // Restore the removed element
             setProject(prev => prev ? { ...prev, elements: [...prev.elements, entry.old_element!] } : prev);
         } else if (entry.status === 'modified' && entry.old_element) {
-            // Revert to old version
             setProject(prev => prev ? {
                 ...prev,
                 elements: prev.elements.map(e => e.id === entryId ? entry.old_element! : e)
@@ -197,12 +260,14 @@ export function useBIMStore() {
         project,
         previousProject,
         isProcessing,
+        pipelineStep,
         logs,
         lintIssues,
         diffEntries,
         ghostMode,
         selectedElementId,
         uploadPlan,
+        loadDemo,
         sendMessage,
         acceptDiffEntry,
         rejectDiffEntry,

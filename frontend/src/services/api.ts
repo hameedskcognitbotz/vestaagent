@@ -72,17 +72,44 @@ export const CONTEXT_REFS: ContextRef[] = [
     { type: 'Style', label: '@Style', icon: '🎨', description: 'Active style profile & preferences' },
 ];
 
+export interface ProjectSummary {
+    project_id: string;
+    name: string;
+    updated_at: string;
+}
+
+export interface JobResponse {
+    job_id: string;
+    project_id: string;
+    kind: string;
+    status: 'pending' | 'running' | 'completed' | 'failed';
+    current_step: string;
+    result: { project_id: string; bim_state: BIMProjectState; vision_notes: string } | null;
+    error: string | null;
+    created_at: string;
+    completed_at: string | null;
+}
+
+export interface UploadResponse {
+    job_id: string;
+    project_id: string;
+    status: string;
+}
+
 export const ApiService = {
-    uploadPlan: async (file: File): Promise<{ project_id: string; bim_state: BIMProjectState; vision_notes: string }> => {
+    /** Start an async upload — returns a job_id for polling. */
+    uploadPlan: async (file: File): Promise<UploadResponse> => {
         const formData = new FormData();
         formData.append('file', file);
-
         const response = await axios.post(`${API_BASE}/project/upload-plan`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
+            headers: { 'Content-Type': 'multipart/form-data' },
         });
+        return response.data;
+    },
 
+    /** Poll the status of a background pipeline job. */
+    pollJob: async (jobId: string): Promise<JobResponse> => {
+        const response = await axios.get(`${API_BASE}/project/job/${jobId}`);
         return response.data;
     },
 
@@ -90,9 +117,49 @@ export const ApiService = {
         const response = await axios.post(`${API_BASE}/project/chat`, {
             project_id: projectId,
             message,
-            current_state: currentState
+            current_state: currentState,
         });
+        return response.data;
+    },
 
+    // Persistence
+    saveProject: async (project: BIMProjectState): Promise<{ status: string; project_id: string }> => {
+        const response = await axios.post(`${API_BASE}/project/save`, project);
+        return response.data;
+    },
+
+    loadProject: async (projectId: string): Promise<{ bim_state: BIMProjectState }> => {
+        const response = await axios.get(`${API_BASE}/project/${projectId}`);
+        return response.data;
+    },
+
+    listProjects: async (): Promise<{ projects: ProjectSummary[] }> => {
+        const response = await axios.get(`${API_BASE}/projects`);
+        return response.data;
+    },
+
+    deleteProject: async (projectId: string): Promise<void> => {
+        await axios.delete(`${API_BASE}/project/${projectId}`);
+    },
+
+    // Demo
+    loadDemo: async (): Promise<{ project_id: string; bim_state: BIMProjectState; vision_notes: string }> => {
+        const response = await axios.get(`${API_BASE}/project/demo/load`);
+        return response.data;
+    },
+
+    // Export
+    exportIfc: async (project: BIMProjectState): Promise<Blob> => {
+        const response = await axios.post(`${API_BASE}/project/export/ifc`, project, {
+            responseType: 'blob'
+        });
+        return response.data;
+    },
+
+    exportDxf: async (project: BIMProjectState): Promise<Blob> => {
+        const response = await axios.post(`${API_BASE}/project/export/dxf`, project, {
+            responseType: 'blob'
+        });
         return response.data;
     },
 };
